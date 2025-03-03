@@ -26,7 +26,7 @@ const ChatBot = () => {
 
       try {
         const res = await axios.post(
-          "https://api.openai.com/v1/chat/completions",
+          "https://api.openai.com/v1/completions",
           {
             model: "gpt-3.5-turbo",
             messages: [{ role: "user", content: userInput }],
