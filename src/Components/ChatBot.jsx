@@ -6,6 +6,7 @@ import { Card, CardContent } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
 import { motion } from "framer-motion";
 import debounce from "lodash.debounce";
+import Navbar from "./Navbar";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -55,6 +56,7 @@ const ChatBot = () => {
 
   return (
     <div className="max-w-lg mx-auto p-4 flex flex-col gap-4">
+      <Navbar />
       <Card className="h-96 overflow-hidden">
         <ScrollArea className="h-full p-4">
           {messages.map((msg, index) => (
