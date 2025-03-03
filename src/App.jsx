@@ -8,17 +8,17 @@ function App() {
   const cardData = [
     {
       title: "Challenges",
-      image: "images/challenge.jpg",
+      image: "/images/challenge.jpg",
       description: "Join our fitness challenges",
     },
     {
       title: "Workout",
-      image: "images//workout.svg",
+      image: "/images/workout.svg",
       description: "Get access to our workout plans",
     },
     {
       title: "Diet",
-      image: "images//diet.jpg",
+      image: "/images/diet.jpg",
       description: "Be guided on what to eat",
     },
   ];
