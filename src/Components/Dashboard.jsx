@@ -17,7 +17,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "./ui/alert-dialog";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
 import StartedWorkout from "./StartedWorkout";
