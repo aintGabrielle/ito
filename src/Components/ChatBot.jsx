@@ -3,7 +3,9 @@ import axios from "axios";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
+import { UserAuth } from "../Context/AuthContext";
 import { ScrollArea } from "./ui/scroll-area";
+import useUser from "../hooks/useUser";
 import { motion } from "framer-motion";
 import debounce from "lodash.debounce";
 import Navbar from "./Navbar";
@@ -12,9 +14,10 @@ const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 const ChatBot = () => {
   const [input, setInput] = useState("");
+  const { session, signOut } = UserAuth();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const { user } = useUser();
   // Move fetchChatResponse outside useEffect to fix scope issue
   const fetchChatResponse = useCallback(
     debounce(async (userInput) => {
@@ -53,7 +56,31 @@ const ChatBot = () => {
     }, 1000),
     []
   );
+useEffect(() => {
+    const fetchUserStatistics = async () => {
+      if (!user) return;
 
+      const { data, error } = await supabase
+        .from("statistics")
+        .select("*")
+        .eq("user_id", user.id);
+
+      if (error) console.error(error);
+      else setStatistics(data);
+    };
+
+    fetchUserStatistics();
+  }, [user]);
+
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    try {
+      await signOut();
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <div className="max-w-5xl mx-auto flex flex-col gap-4">
       <Navbar />
