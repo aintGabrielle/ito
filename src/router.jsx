@@ -5,7 +5,7 @@ import Dashboard from "./Components/Dashboard";
 import App from "./App";
 import PrivateRoute from "./Components/PrivateRoute";
 import AboutSelf from "./Components/AboutSelf";
-import Challenge from "./challenge";
+
 import Activity from "./Components/Activity";
 import ProfilePage from "./Components/Profile";
 import StartedWorkout from "./Components/StartedWorkout";
@@ -47,14 +47,7 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-  {
-    path: "/challenge",
-    element: (
-      <PrivateRoute>
-        <Challenge />
-      </PrivateRoute>
-    ),
-  },
+
   {
     path: "/aboutself",
     element: (
