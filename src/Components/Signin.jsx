@@ -76,7 +76,7 @@ const Signin = () => {
           </div>
         </form>
         <div className="hidden lg:block">
-          <img src="/src/assets/images/cycling.jpg" className="w-full" alt="" />
+          <img src="/images/cycling.jpg" className="w-full" alt="" />
         </div>
       </div>
     </div>
