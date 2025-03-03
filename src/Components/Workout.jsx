@@ -22,19 +22,19 @@ const supabase = createClient(
 
 const workouts = [
   {
-    image: "/src/images/challenges/squat.png",
-    title: "Squat",
-    description: "A squat is a strength exercise...",
+    image: "/src/assets/images/challenges/hipdip.jpg",
+    title: "Hip Dip",
+    description: "A core and oblique exercise where you move your hips side to side while holding a forearm plank position. This movement targets the obliques, glutes, and core, helping to improve stability, strength, and muscle definition in the midsection.",
   },
   {
-    image: "/images/challenges/pushup.jpg",
-    title: "Push Up",
-    description: "The push-up is a common calisthenics...",
+    image: "/src/assets/images/challenges/updownplank.jpg",
+    title: "Up Down Plank",
+    description: "A dynamic core exercise that involves transitioning between a forearm plank and a full plank position. This movement targets the core, shoulders, and arms, improving strength, stability, and endurance. It also helps enhance coordination and engages multiple muscle groups for a full-body workout.",
   },
   {
-    image: "/images/challenges/plank.jpg",
-    title: "Plank",
-    description: "Planks are a basic (but not easy!) exercise...",
+    image: "/src/assets/images/challenges/jumpsquat.jpg",
+    title: "Jump Squat",
+    description: "A high-intensity plyometric exercise that combines squats with an explosive jump. This move helps to build strength, power, and endurance in the lower body, targeting the quads, hamstrings, glutes, and calves. Ideal for boosting athletic performance and improving overall fitness.",
   },
 ];
 

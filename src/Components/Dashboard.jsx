@@ -30,26 +30,26 @@ const Dashboard = () => {
 
   const cardData = [
     {
-      image: "/src/images/challenges/running.jpg",
+      image: "/src/assets/images/challenges/running.jpg",
       title: "Walking Activity",
       description:
         "Your Fitness Activity is near complete, you have a very brave mentality and wise decision making",
       progress: 88,
     },
     {
-      image: "/src/images/challenges/walking.jpg",
+      image: "/src/assets/images/challenges/walking.jpg",
       title: "Walking Activity",
       description: "Your Fitness Activity is half way complete, keep it up!",
       progress: 55,
     },
     {
-      image: "/src/images/challenges/pushup.png",
+      image: "/src/assets/images/challenges/pushup.png",
       title: "Pushup Activity",
       description: "Your Fitness Activity is completed!, well done brave!",
       progress: 100,
     },
     {
-      image: "/src/images/challenges/squat.png",
+      image: "/src/assets/images/challenges/squat.png",
       title: "Squat Activity",
       description:
         "You started Fitness Activity, we are rooting for your journey!",
@@ -191,7 +191,7 @@ const Dashboard = () => {
               <AlertDialogContent>
                 <AlertDialogTitle>START TRACKING</AlertDialogTitle>
                 <AlertDialogDescription>
-                  <img src="/src/images/map.png" className="w-full" alt="" />
+                  <img src="/src/assets/images/map.png" className="w-full" alt="" />
                 </AlertDialogDescription>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>

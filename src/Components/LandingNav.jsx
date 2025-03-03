@@ -5,7 +5,7 @@ const LandingNav = () => {
   return (
     <nav className="flex justify-around items-center px-3 py-2 w-full top-0 left-0 sticky bg-white">
       <div className="flex items-center gap-2">
-        <img src="/src/images/logo.png" className="w-16" alt="" />
+        <img src="/src/assets/images/logo.png" className="w-16" alt="" />
         <h3 className="font-bold text-xl text-green-400 italic">FitMission</h3>
       </div>
       <div>

@@ -54,7 +54,7 @@ const StartedWorkout = () => {
           </CardDescription>
         </CardHeader>
         <img
-          src={`/src/images/challenges/${workout.workout_title
+          src={`/src/assets/images/challenges/${workout.workout_title
             .toLowerCase()
             .replace(/\s+/g, "")}.jpg`}
           className="w-full h-64 object-cover rounded-xl"

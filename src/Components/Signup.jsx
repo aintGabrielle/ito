@@ -77,7 +77,7 @@ const Signup = () => {
         </form>
         <div className="hidden lg:block">
           <img
-            src="/src/images/fitness.svg"
+            src="/src/assets/images/fitness.svg"
             className="w-full mx-auto"
             alt=""
           />
