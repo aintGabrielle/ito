@@ -16,6 +16,7 @@ const ChatBot = () => {
   const [input, setInput] = useState("");
   const { session, signOut } = UserAuth();
   const [messages, setMessages] = useState([]);
+  const [statistics, setStatistics] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
   // Move fetchChatResponse outside useEffect to fix scope issue
