@@ -8,17 +8,17 @@ function App() {
   const cardData = [
     {
       title: "Challenges",
-      image: "/src/assets/imageschallenge.jpg",
+      image: "images/challenge.jpg",
       description: "Join our fitness challenges",
     },
     {
       title: "Workout",
-      image: "/src/assets/imagesworkout.svg",
+      image: "images//workout.svg",
       description: "Get access to our workout plans",
     },
     {
       title: "Diet",
-      image: "/src/assets/imagesdiet.jpg",
+      image: "images//diet.jpg",
       description: "Be guided on what to eat",
     },
   ];
@@ -44,7 +44,7 @@ function App() {
           </Link>
         </div>
         <img
-          src="/src/assets/images/workout.svg"
+          src="images/images//workout.svg"
           className="w-full md:max-w-2xl mx-auto order-1 md:order-2"
           alt=""
         />
@@ -93,7 +93,7 @@ function App() {
         <div className="mt-20 pt-20 border-t-2 flex flex-col gap-12 border-green-100">
           <div className="grid grid-cols-1 md:grid-cols-2 items-center bg-white p-4 ">
             <img
-              src="/src/assets/images/fitness.svg"
+              src="images/images//fitness.svg"
               className="w-full max-w-[300px] md:max-w-[500px] mx-auto"
               alt=""
             />
@@ -122,7 +122,7 @@ function App() {
             </div>
             <div className="order-1 md:order-2">
               <img
-                src="/src/assets/images/ai.svg"
+                src="images/images//ai.svg"
                 className="w-full max-w-[400px] md:max-w-[600px] mx-auto "
                 alt=""
               />
@@ -130,7 +130,7 @@ function App() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 items-center bg-white p-4">
             <img
-              src="/src/assets/images/challenge.svg"
+              src="images/images//challenge.svg"
               className="w-full max-w-[300px] md:max-w-[400px] mx-auto"
               alt=""
             />
