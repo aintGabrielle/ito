@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import useUser from "../hooks/useUser";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 import Navbar from "./Navbar";
 import { UserAuth } from "@/Context/AuthContext";
 

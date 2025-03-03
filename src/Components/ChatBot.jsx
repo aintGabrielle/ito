@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "./ui/ui/input";
+import { Button } from "./ui/ui/button";
+import { Card, CardContent } from "./ui/ui/card";
+import { ScrollArea } from "./ui/ui/scroll-area";
 import { motion } from "framer-motion";
 import debounce from "lodash.debounce";
 

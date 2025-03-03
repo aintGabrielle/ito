@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "./ui/accordion";
 import {
   Card,
   CardContent,
@@ -14,7 +13,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "./ui/card";
 import Workout from "./Workout";
 import useUser from "@/hooks/useUser";
 import { supabase } from "@/supabaseClient";

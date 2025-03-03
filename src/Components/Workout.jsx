@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogCancel,
   AlertDialogAction,
-} from "@/components/ui/alert-dialog";
+} from "./ui/alert-dialog";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
