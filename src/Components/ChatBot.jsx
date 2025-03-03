@@ -55,7 +55,7 @@ const ChatBot = () => {
   );
 
   return (
-    <div className="max-w-lg mx-auto p-4 flex flex-col gap-4">
+    <div className="max-w-5xl mx-auto flex flex-col gap-4">
       <Navbar />
       <Card className="h-96 overflow-hidden">
         <ScrollArea className="h-full p-4">
