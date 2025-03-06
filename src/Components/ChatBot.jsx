@@ -1,25 +1,30 @@
 import { useState, useEffect, useCallback } from "react";
+import { supabase } from "../supabaseClient";
 import axios from "axios";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
-import { UserAuth } from "../Context/AuthContext";
+import { Card } from "./ui/card";
+import { useAuth } from "@/Context/AuthContext";
 import { ScrollArea } from "./ui/scroll-area";
 import useUser from "../hooks/useUser";
 import { motion } from "framer-motion";
 import debounce from "lodash.debounce";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 const ChatBot = () => {
   const [input, setInput] = useState("");
-  const { session, signOut } = UserAuth();
-  const [messages, setMessages] = useState([]);
+  const { session, signOut } = useAuth();
+  const [messages, setMessages] = useState([
+    { role: "bot", content: "Hello! How can I help you?" },
+  ]);
   const [statistics, setStatistics] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
-  // Move fetchChatResponse outside useEffect to fix scope issue
+  const navigate = useNavigate();
+
   const fetchChatResponse = useCallback(
     debounce(async (userInput) => {
       if (!userInput.trim()) return;
@@ -27,7 +32,7 @@ const ChatBot = () => {
 
       try {
         const res = await axios.post(
-          "https://api.openai.com/v1/completions",
+          "https://api.openai.com/v1/chat/completions",
           {
             model: "gpt-3.5-turbo",
             messages: [{ role: "user", content: userInput }],
@@ -47,30 +52,32 @@ const ChatBot = () => {
         ]);
       } catch (error) {
         if (error.response?.status === 429) {
-          console.warn("Rate limit exceeded. Retrying in 5 seconds...");
-          setTimeout(() => fetchChatResponse(userInput), 5000);
+          console.warn("Rate limit exceeded. Retrying in 6 seconds...");
+          setTimeout(() => fetchChatResponse(userInput), 6000);
         } else {
           console.error("Error fetching response:", error);
         }
       }
       setLoading(false);
-    }, 1000),
+    }, 2000), // Increased debounce delay to 2 seconds
     []
   );
-useEffect(() => {
-    const fetchUserStatistics = async () => {
+
+  useEffect(() => {
+    const fetchMessages = async () => {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from("statistics")
+        .from("chat_messages")
         .select("*")
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
 
       if (error) console.error(error);
-      else setStatistics(data);
+      else setMessages(data);
     };
 
-    fetchUserStatistics();
+    fetchMessages();
   }, [user]);
 
   const handleSignOut = async (e) => {
@@ -82,44 +89,47 @@ useEffect(() => {
       console.error(err);
     }
   };
+
   return (
-    <div className="max-w-5xl mx-auto flex flex-col gap-4">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <Navbar />
-      <Card className="h-96 overflow-hidden">
-        <ScrollArea className="h-full p-4">
-          {messages.map((msg, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`mb-2 p-3 rounded-lg max-w-xs ${
-                msg.role === "user"
-                  ? "bg-blue-500 text-white ml-auto"
-                  : "bg-gray-200 text-black"
-              }`}
-            >
-              {msg.content}
-            </motion.div>
-          ))}
-        </ScrollArea>
-      </Card>
-      <div className="flex gap-2">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask me anything..."
-          className="flex-1"
-        />
-        <Button
-          onClick={() => {
-            fetchChatResponse(input);
-            setInput("");
-          }}
-          disabled={loading}
-        >
-          {loading ? "Thinking..." : "Send"}
-        </Button>
+      <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <Card className="w-full max-w-2xl h-96 overflow-hidden">
+          <ScrollArea className="h-full p-4">
+            {messages.map((msg, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`mb-2 p-3 rounded-lg max-w-xs ${
+                  msg.role === "user"
+                    ? "bg-blue-500 text-white ml-auto"
+                    : "bg-gray-200 text-black"
+                }`}
+              >
+                {msg.content}
+              </motion.div>
+            ))}
+          </ScrollArea>
+        </Card>
+        <div className="flex gap-2 w-full max-w-2xl mt-4">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask me anything..."
+            className="flex-1"
+          />
+          <Button
+            onClick={() => {
+              fetchChatResponse(input);
+              setInput("");
+            }}
+            disabled={loading}
+          >
+            {loading ? "Thinking..." : "Send"}
+          </Button>
+        </div>
       </div>
     </div>
   );

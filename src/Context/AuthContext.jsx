@@ -4,70 +4,61 @@ import { supabase } from "../supabaseClient";
 const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
-  const [session, setSession] = useState(undefined);
+  const [session, setSession] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  //   SignUP
+  useEffect(() => {
+    const restoreSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+      setUser(data.session?.user || null);
+      setLoading(false);
+    };
+
+    restoreSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  // Sign Up
   const signUpNewUser = async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-
-    if (error) {
-      console.log("Problem in signing up: ", error);
-      return { success: false, error };
-    }
-
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) return { success: false, error };
     return { success: true, data };
   };
 
-  //   Sign in
-
+  // Sign In
   const signInUser = async (email, password) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) {
-        console.log("Error in Sign in: ", error);
-        return { success: false, error };
-      }
-
-      return { success: true, data };
-    } catch (error) {}
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) return { success: false, error };
+    return { success: true, data };
   };
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
-
-  // Sign out
-
-  const signOut = () => {
-    const { error } = supabase.auth.signOut();
-
-    if (error) {
-      console.log("Error in: ", error);
-    }
+  // Sign Out
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{ session, signUpNewUser, signOut, signInUser }}
+      value={{ session, user, signUpNewUser, signInUser, signOut }}
     >
-      {children}
+      {!loading ? children : <p>Loading...</p>}
     </AuthContext.Provider>
   );
 };
 
-export const UserAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

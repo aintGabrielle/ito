@@ -5,16 +5,24 @@ import Dashboard from "./Components/Dashboard";
 import App from "./App";
 import PrivateRoute from "./Components/PrivateRoute";
 import AboutSelf from "./Components/AboutSelf";
-
 import Activity from "./Components/Activity";
 import ProfilePage from "./Components/Profile";
 import StartedWorkout from "./Components/StartedWorkout";
 import ChatBot from "./Components/ChatBot";
+import TimeBasedChallenge from "./Components/Challenge";
 
 export const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/signin", element: <Signin /> },
   { path: "/signup", element: <Signup /> },
+  {
+    path: "/challenge",
+    element: (
+      <PrivateRoute>
+        <TimeBasedChallenge />
+      </PrivateRoute>
+    ),
+  },
   {
     path: "/chatbot",
     element: (
@@ -47,7 +55,6 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-
   {
     path: "/aboutself",
     element: (

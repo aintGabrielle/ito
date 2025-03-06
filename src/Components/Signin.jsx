@@ -1,15 +1,14 @@
-import React from "react";
-import { useState } from "react";
-import { UserAuth } from "../Context/AuthContext";
+import React, { useState } from "react";
+import { useAuth } from "../Context/AuthContext"; // ✅ Correct import
 import { Link, useNavigate } from "react-router-dom";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const { session, signInUser } = UserAuth();
+  const { session, signInUser } = useAuth(); // ✅ Correct usage
   const navigate = useNavigate();
 
   const handleSignIn = async (e) => {
@@ -21,20 +20,23 @@ const Signin = () => {
 
       if (result.success) {
         navigate("/dashboard");
+      } else {
+        setError("Invalid credentials");
       }
     } catch (error) {
-      setError("Error occured");
+      setError("An error occurred while signing in");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="flex justify-center items-center flex-col w-full h-screen p-5">
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center w-full max-w-3xl mx-auto p-5 shadow-md rounded-xl">
         <form onSubmit={handleSignIn} className="">
           <div className="flex items-center justify-around">
             <div className="flex items-center gap-2">
-              <img src="/src/images/logo.png" className="w-14" alt="" />
+              <img src="/src/images/logo.png" className="w-14" alt="Logo" />
               <h1 className="text-xl font-bold text-green-400 italic">
                 FitMission
               </h1>
@@ -63,7 +65,7 @@ const Signin = () => {
               disabled={loading}
               className="bg-yellow-400 px-2 py-3 rounded-lg text-xl text-white"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </button>
             <p className="text-lg">
               Don't have an account?{" "}
@@ -72,11 +74,11 @@ const Signin = () => {
               </Link>
             </p>
             <Link to={"/"}>Back to home</Link>
-            {error && <p>{Error}</p>}
+            {error && <p className="text-red-500">{error}</p>}
           </div>
         </form>
         <div className="hidden lg:block">
-          <img src="/images/cycling.jpg" className="w-full" alt="" />
+          <img src="/images/cycling.jpg" className="w-full" alt="Cycling" />
         </div>
       </div>
     </div>

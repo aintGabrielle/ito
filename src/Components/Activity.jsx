@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import {
   Accordion,
   AccordionContent,
@@ -9,370 +8,181 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "./ui/card";
 import Workout from "./Workout";
+import { Link, useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
 import { supabase } from "@/supabaseClient";
+import Navbar from "./Navbar";
+import { useAuth } from "@/Context/AuthContext";
+import { Menu, X } from "lucide-react";
 
 const Activity = () => {
-  const LowCarbDiet = [
-    {
-      title: "Eggs",
-      description:
-        "A convenient source of protein, B vitamins, zinc, selenium, and vitamin D",
-    },
-    {
-      title: "Fish",
-      description: "High in protein, B vitamins, potassium, and selenium",
-    },
-    {
-      title: "Cheese",
-      description: "High in protein, healthy fats, and calcium",
-    },
-    {
-      title: "Greek Yogurt",
-      description: "High in protein and calcium",
-    },
-    {
-      title: "Broccoli",
-      description:
-        "A popular keto vegetable, along with other cruciferous vegetables",
-    },
-    {
-      title: "Leafy greens",
-      description: "A popular keto vegetable",
-    },
-    {
-      title: "Asparagus",
-      description: "A popular keto vegetable",
-    },
-    {
-      title: "Cucumber",
-      description: "A popular keto vegetable",
-    },
-    {
-      title: "Zucchini",
-      description: "A popular keto vegetable",
-    },
-    {
-      title: "Leafy greens",
-      description: "A popular keto vegetable",
-    },
-  ];
-
-  const lowCarbDishBf = [
-    {
-      description: "- Omelette with spinach and feta cheese",
-    },
-    {
-      description: "- Egg white scramble with chopped bell peppers and bacon ",
-    },
-    {
-      description: "- Avocado toast with smoked salmon ",
-    },
-  ];
-  const lowCarbDishLunch = [
-    {
-      description: "- Chicken salad with mixed greens and cucumber ",
-    },
-    {
-      description: "- Tuna salad with celery and low-carb crackers  ",
-    },
-    {
-      description:
-        "- Cauliflower rice bowl with grilled steak and roasted Brussels sprouts ",
-    },
-  ];
-  const lowCarbDishDinner = [
-    {
-      description:
-        "- Cauliflower rice bowl with grilled steak and roasted Brussels sprouts ",
-    },
-    {
-      description: "- Beef stir-fry with broccoli and snap peas ",
-    },
-    {
-      description:
-        "- Stuffed portobello mushrooms with ground turkey and spinach ",
-    },
-  ];
-
-  const VegetarianDiet = [
-    "- Nuts and dried fruit",
-    "- Popcorn",
-    "- Dates and tahini",
-    "- Fresh fruit with cheese, yogurt or nut butter",
-    "- Hummus and pita wedges",
-    "- Cucumber slices with chile powder and lime",
-    "- Dried seaweed",
-    "- Cheese and whole-grain crackers",
-    "- Wasabi peas",
-    "- Plantain or banana chips",
-    "- Fruit smoothie",
-    "- Spring rolls filled with fresh vegetables",
-  ];
-
-  const VegetarianLunch = [
-    "- Grape leaves stuffed with rice, pine nuts, herbs and diced tomato",
-    "- Vegetable sandwich: Sliced tomato, pepper, onion, avocado and hummus stuffed between slices of whole-grain bread or on a wrap",
-    "- Chili made with beans and textured vegetable protein, served with cornbread",
-    "- Vegetable burger with sauteed mushrooms and tomato on a whole-grain bun",
-    "- Chana masala, a chickpea curry in tomato gravy, with naan bread and vegetable raita",
-  ];
-
-  const VegetarianBF = [
-    "- Instant oatmeal made with low-fat or fat-free milk or soymilk, with nuts and chopped banana",
-    "- Beans and brown rice, tomato, cooked plantain and an egg cooked your way",
-    "- Low-fat yogurt or soy yogurt layered with crunchy cereal and berries for a breakfast parfait",
-    "- Vegetable upma, a hot breakfast made from a creamy porridge and vegetables including onions, carrots and green beans and spiced with ginger, curry leaves, mustard seeds and cumin",
-  ];
-
-  const VegetarianDinner = [
-    "- Vermicelli noodles with tofu, stir fried bean sprouts, napa cabbage and carrot and side of fresh fruit",
-    "- Whole-grain pasta with tomato sauce and sauteed or roasted vegetables such as mushrooms, tomatoes, eggplant, peppers and onions",
-    "- Tacos or burritos filled with your favorite combination of beans or lentils, cheese and vegetables",
-    "- Tabbouleh and lentil soup, with pomegranate and low-fat yogurt",
-  ];
-
-  const HeavyMeal = [
-    "- avocado toast with poached eggs ",
-    "- grilled chicken with brown rice and roasted vegetables ",
-    "- protein-packed smoothies ",
-    "- cheese and nut-filled omelets ",
-    "- salmon with quinoa ",
-    "- lentil soup with whole-wheat bread ",
-    "- peanut butter and banana sandwiches ",
-    "- full-fat yogurt with granola and berries- ",
-    "- Homemade protein bars with nuts and dried fruit",
-  ];
-
-  const HeavyMealBf = [
-    "Scrambled eggs with avocado and whole-wheat toast, protein smoothie with banana and almond butter, oatmeal with mixed nuts and fruit ",
-  ];
-  const HeavyMealLunch = [
-    "Grilled chicken salad with avocado and quinoa, tuna melt on whole-wheat bread with a side of sweet potato fries, lentil soup with whole-grain bread ",
-  ];
-  const HeavyMealDinner = [
-    "Baked salmon with roasted vegetables and brown rice, beef stir-fry with brown rice, chicken breast with mashed potatoes and steamed broccoli ",
-  ];
   const { user } = useUser();
   const [statistics, setStatistics] = useState([]);
-
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     const fetchUserStatistics = async () => {
       if (!user) return;
-
       const { data, error } = await supabase
         .from("statistics")
         .select("*")
         .eq("user_id", user.id);
-
       if (error) console.error(error);
       else setStatistics(data);
     };
-
     fetchUserStatistics();
   }, [user]);
+
+  const diets = [
+    {
+      title: "Low-Carb Diet",
+      foods: [
+        {
+          name: "Eggs",
+          description: "A great source of protein and vitamins.",
+        },
+        {
+          name: "Fish",
+          description: "Rich in omega-3 fatty acids and protein.",
+        },
+      ],
+      meals: {
+        breakfast: [
+          "Omelette with spinach and cheese",
+          "Avocado toast with smoked salmon",
+        ],
+        lunch: ["Chicken salad with greens", "Tuna salad with celery"],
+        dinner: ["Grilled steak with veggies", "Beef stir-fry with broccoli"],
+      },
+    },
+    {
+      title: "Vegetarian Diet",
+      foods: [
+        { name: "Nuts", description: "A great plant-based protein source." },
+        { name: "Hummus", description: "Delicious and rich in healthy fats." },
+      ],
+      meals: {
+        breakfast: ["Oatmeal with nuts and banana", "Vegetable upma"],
+        lunch: ["Chickpea curry with naan", "Vegetable burger"],
+        dinner: [
+          "Whole-grain pasta with veggies",
+          "Tacos with beans and cheese",
+        ],
+      },
+    },
+  ];
+
   return (
-    <div className=" w-full lg:max-w-5xl mx-auto flex flex-col px-3 py-2">
-      <div className="flex justify-around items-center py-5">
-        <div className="flex items-center gap-2">
-          <img src="/src/images/logo.png" className="w-16" alt="" />
-          <h1 className="font-bold italic text-2xl text-green-400">
-            FitMission
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link to={"/dashboard"}>Dashboard</Link>
-          <Link to={"/challenge"}>Challenge</Link>
-          <Link to={"/activity"}>Activity</Link>
-          <Link to={"/chatbot"}>AI</Link>
-          <Link to={"/profile"}>Profile</Link>
-          <h2 className="inline-flex gap-2 items-center">
-            Welcome,{" "}
-            {statistics.length > 0 ? (
-              statistics.map((stat) => (
-                <span className="text-2xl" key={stat.id}>
-                  {stat.first_name}
-                </span>
-              ))
-            ) : (
-              <p>Loading...</p>
-            )}
-          </h2>
+    <div className="flex flex-col lg:flex-row w-full min-h-screen">
+      <div
+        className={`absolute md:relative inset-y-0 left-0 w-64 bg-white shadow-lg transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out md:translate-x-0 md:w-64 z-50`}
+      >
+        <div className="p-5 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <img src="/images/logo.png" className="w-12" alt="Logo" />
+              <h1 className="font-bold italic text-xl text-green-500">
+                FitMission
+              </h1>
+            </div>
+            <button
+              className="md:hidden p-2 text-gray-700"
+              onClick={() => setIsOpen(false)}
+            >
+              <X size={24} />
+            </button>
+          </div>
+          <nav className="flex flex-col space-y-4">
+            <Link to="/dashboard" className="hover:text-green-500">
+              Dashboard
+            </Link>
+            <Link to="/challenge" className="hover:text-green-500">
+              Challenge
+            </Link>
+            <Link to="/activity" className="hover:text-green-500">
+              Activity
+            </Link>
+            <Link to="/chatbot" className="hover:text-green-500">
+              Coach
+            </Link>
+            <Link to="/profile" className="hover:text-green-500">
+              Profile
+            </Link>
+          </nav>
+          <div className="mt-auto">
+            <h2 className="text-sm text-gray-500">
+              Welcome,{" "}
+              {statistics.length > 0 ? statistics[0].first_name : "Loading..."}
+            </h2>
+          </div>
         </div>
       </div>
-      <h1 className="text-3xl font-semibold text-primary">RECOMMENDED DIETS</h1>
-      <div className="w-full">
-        <Accordion type="single" collapsible>
-          <AccordionItem value="item-1">
-            <AccordionTrigger>Low-Carb Diet</AccordionTrigger>
-            <AccordionContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex flex-col gap-2">
-                  {LowCarbDiet.map((item, index) => (
-                    <Card key={index + 1}>
-                      <CardHeader className="flex flex-col gap-1">
-                        <CardTitle className="text-xl text-primary">
-                          {item.title}
-                        </CardTitle>
-                        <CardDescription className="text-black">
-                          {item.description}
-                        </CardDescription>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </div>
-                <div>
-                  <Card className="p-2">
+      <div className="flex-1 p-4 sm:p-6">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-primary mb-4">
+          RECOMMENDED DIETS
+        </h1>
+        <Accordion type="single" collapsible className="space-y-4">
+          {diets.map((diet, index) => (
+            <AccordionItem key={index} value={`diet-${index}`}>
+              <AccordionTrigger>{diet.title}</AccordionTrigger>
+              <AccordionContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    {diet.foods.map((food, i) => (
+                      <Card key={i}>
+                        <CardHeader>
+                          <CardTitle className="text-lg">{food.name}</CardTitle>
+                          <CardDescription>{food.description}</CardDescription>
+                        </CardHeader>
+                      </Card>
+                    ))}
+                  </div>
+                  <Card className="p-4">
                     <CardContent>
-                      <div className="flex flex-col gap-2">
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Breakfast
-                          </h1>
-                          <div className="flex flex-col gap-1">
-                            {lowCarbDishBf.map((item, index) => (
-                              <p key={index}>{item.description}</p>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Lunch
-                          </h1>
-                          {lowCarbDishLunch.map((item, index) => (
-                            <p key={index}>{item.description}</p>
+                      <h2 className="text-xl font-semibold">Meals</h2>
+                      <div className="mt-2">
+                        <h3 className="font-medium">Breakfast</h3>
+                        <ul className="list-disc pl-4">
+                          {diet.meals.breakfast.map((meal, i) => (
+                            <li key={i}>{meal}</li>
                           ))}
-                        </div>
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Dinner
-                          </h1>
-                          {lowCarbDishDinner.map((item, index) => (
-                            <p key={index}>{item.description}</p>
+                        </ul>
+                      </div>
+                      <div className="mt-2">
+                        <h3 className="font-medium">Lunch</h3>
+                        <ul className="list-disc pl-4">
+                          {diet.meals.lunch.map((meal, i) => (
+                            <li key={i}>{meal}</li>
                           ))}
-                        </div>
+                        </ul>
+                      </div>
+                      <div className="mt-2">
+                        <h3 className="font-medium">Dinner</h3>
+                        <ul className="list-disc pl-4">
+                          {diet.meals.dinner.map((meal, i) => (
+                            <li key={i}>{meal}</li>
+                          ))}
+                        </ul>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-2">
-            <AccordionTrigger>Vegetarian Diets</AccordionTrigger>
-            <AccordionContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex flex-col gap-2">
-                  {VegetarianDiet.map((item, index) => (
-                    <Card key={index + 1}>
-                      <CardHeader className="flex flex-col gap-1">
-                        <CardTitle className="text-xl text-primary">
-                          {item}
-                        </CardTitle>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </div>
-                <div>
-                  <Card className="p-2">
-                    <CardContent>
-                      <div className="flex flex-col gap-2">
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Breakfast
-                          </h1>
-                          <div className="flex flex-col gap-1">
-                            {VegetarianBF.map((item, index) => (
-                              <p key={index}>{item}</p>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Lunch
-                          </h1>
-                          {VegetarianLunch.map((item, index) => (
-                            <p key={index}>{item}</p>
-                          ))}
-                        </div>
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Dinner
-                          </h1>
-                          {VegetarianDinner.map((item, index) => (
-                            <p key={index}>{item}</p>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="item-3">
-            <AccordionTrigger>Intermittent Fasting</AccordionTrigger>
-            <AccordionContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex flex-col gap-2">
-                  {HeavyMeal.map((item, index) => (
-                    <Card key={index + 1}>
-                      <CardHeader className="flex flex-col gap-1">
-                        <CardTitle className="text-xl text-primary">
-                          {item}
-                        </CardTitle>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </div>
-                <div>
-                  <Card className="p-2">
-                    <CardContent>
-                      <div className="flex flex-col gap-2">
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Breakfast
-                          </h1>
-                          <div className="flex flex-col gap-1">
-                            {HeavyMealBf.map((item, index) => (
-                              <p key={index}>{item}</p>
-                            ))}
-                          </div>
-                        </div>
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Lunch
-                          </h1>
-                          {HeavyMealLunch.map((item, index) => (
-                            <p key={index}>{item}</p>
-                          ))}
-                        </div>
-                        <div>
-                          <h1 className="text-xl font-semibold uppercase">
-                            Dinner
-                          </h1>
-                          {HeavyMealDinner.map((item, index) => (
-                            <p key={index}>{item}</p>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
         </Accordion>
-      </div>
-      <div className="flex flex-col mt-5">
-        <h1 className="text-3xl font-semibold text-primary">HOME WORKOUTS</h1>
-        <Workout />
+        <div className="mt-10">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-primary mb-4">
+            HOME WORKOUTS
+          </h1>
+          <Workout />
+        </div>
       </div>
     </div>
   );
