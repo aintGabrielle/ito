@@ -36,7 +36,7 @@ const Signup = () => {
         <form onSubmit={handleSignUp}>
           <div className="flex items-center justify-around">
             <div className="flex items-center gap-2">
-              <img src="/src/images/logo.png" className="w-14" alt="Logo" />
+              <img src="/images/logo.png" className="w-14" alt="Logo" />
               <h1 className="text-xl font-bold text-green-400 italic">
                 FitMission
               </h1>
