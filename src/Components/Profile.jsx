@@ -1,170 +1,169 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import useUser from "../hooks/useUser";
-import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import Navbar from "./Navbar";
-import { useAuth } from "@/Context/AuthContext";
+import { Card } from "./ui/card";
+import { toast } from "sonner";
 
-const ProfilePage = () => {
+const Profile = () => {
   const { user } = useUser();
-  const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [fitnessAssessment, setFitnessAssessment] = useState({
     weight: "",
     height: "",
-    age: "",
-    protein_intake: "",
+    goal: "",
   });
-  const { signOut } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  // Fetch user profile from Supabase
   useEffect(() => {
-    if (!user?.id) return;
-
-    const fetchProfile = async () => {
-      setLoading(true);
-      console.log("Fetching profile for user:", user.id);
-
-      const { data, error } = await supabase
-        .from("statistics")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching profile:", error);
-      } else if (data) {
-        console.log("Fetched Data:", data);
-        setFormData({
-          first_name: data.first_name || "",
-          last_name: data.last_name || "",
-          weight: data.weight || "",
-          height: data.height || "",
-          age: data.age || "",
-          protein_intake: data.protein_intake || "",
-        });
-      }
-      setLoading(false);
-    };
-
-    fetchProfile();
+    if (user) fetchProfileData();
   }, [user]);
 
-  // Handle input changes
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  // Update profile in Supabase
-  const updateProfile = async () => {
+  // Fetch user profile & fitness assessment
+  const fetchProfileData = async () => {
     if (!user) return;
+
     setLoading(true);
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("user_id", user.id)
+      .single();
 
-    const { error } = await supabase
-      .from("statistics")
-      .update(formData)
-      .eq("user_id", user.id);
+    const { data: fitness, error: fitnessError } = await supabase
+      .from("fitness_assessment")
+      .select("weight, height, goal")
+      .eq("user_id", user.id)
+      .single();
 
-    if (error) {
-      console.error("Error updating profile:", error);
-    } else {
-      console.log("Profile updated!");
+    if (profileError) console.error("Error fetching profile:", profileError);
+    if (fitnessError)
+      console.error("Error fetching fitness assessment:", fitnessError);
+
+    if (profile) {
+      setFirstName(profile.first_name || "");
+      setLastName(profile.last_name || "");
     }
-
+    if (fitness) {
+      setFitnessAssessment({
+        weight: fitness.weight || "",
+        height: fitness.height || "",
+        goal: fitness.goal || "",
+      });
+    }
     setLoading(false);
   };
 
-  // Sign out
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      window.location.href = "/"; // Redirect to home after sign-out
-    } catch (err) {
-      console.error("Error signing out:", err);
+  // Handle updating user profile
+  const handleUpdateProfile = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    const { error } = await supabase
+      .from("profiles")
+      .upsert(
+        { user_id: user.id, first_name: firstName, last_name: lastName },
+        { onConflict: ["user_id"] }
+      );
+
+    if (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile.");
+    } else {
+      toast.success("Profile updated successfully!");
     }
+    setLoading(false);
+  };
+
+  // Handle updating fitness assessment
+  const handleUpdateFitness = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    const { error } = await supabase
+      .from("fitness_assessment")
+      .upsert(
+        { user_id: user.id, ...fitnessAssessment },
+        { onConflict: ["user_id"] }
+      );
+
+    if (error) {
+      console.error("Error updating fitness assessment:", error);
+      toast.error("Failed to update fitness assessment.");
+    } else {
+      toast.success("Fitness assessment updated!");
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      <Navbar />
-      <div className="flex flex-col items-center justify-center flex-1 p-6">
-        <Card className="w-full max-w-lg bg-white shadow-xl p-6 rounded-2xl">
-          <CardContent className="flex flex-col gap-6">
-            <h2 className="text-xl font-semibold text-center">
-              {loading ? "Loading Profile..." : "Update Your Statistics"}
-            </h2>
+    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen bg-gray-100 p-6 gap-6">
+      {/* User Profile Card */}
+      <Card className="w-full md:w-1/3 p-4">
+        <h3 className="text-lg font-bold mb-2">👤 User Profile</h3>
+        <Input
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="First Name"
+        />
+        <Input
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          placeholder="Last Name"
+        />
+        <Button
+          onClick={handleUpdateProfile}
+          disabled={loading}
+          className="mt-2 w-full"
+        >
+          {loading ? "Saving..." : "Update Profile"}
+        </Button>
+      </Card>
 
-            {/* Input Fields */}
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                name="first_name"
-                placeholder="First Name"
-                value={formData.first_name || ""}
-                onChange={handleChange}
-              />
-              <Input
-                name="last_name"
-                placeholder="Last Name"
-                value={formData.last_name || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                name="weight"
-                type="number"
-                placeholder="Weight (kg)"
-                value={formData.weight || ""}
-                onChange={handleChange}
-              />
-              <Input
-                name="height"
-                type="number"
-                placeholder="Height (cm)"
-                value={formData.height || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <Input
-              name="age"
-              type="number"
-              placeholder="Age"
-              value={formData.age || ""}
-              onChange={handleChange}
-            />
-            <Input
-              name="protein_intake"
-              type="number"
-              placeholder="Protein Intake (g)"
-              value={formData.protein_intake || ""}
-              onChange={handleChange}
-            />
-
-            {/* Buttons */}
-            <Button
-              onClick={updateProfile}
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? "Updating..." : "Update Profile"}
-            </Button>
-            <Button
-              onClick={handleSignOut}
-              className="w-full bg-red-500 hover:bg-red-600"
-            >
-              Sign Out
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Fitness Assessment Card */}
+      <Card className="w-full md:w-1/3 p-4">
+        <h3 className="text-lg font-bold mb-2">💪 Fitness Assessment</h3>
+        <Input
+          type="number"
+          value={fitnessAssessment.weight}
+          onChange={(e) =>
+            setFitnessAssessment({
+              ...fitnessAssessment,
+              weight: e.target.value,
+            })
+          }
+          placeholder="Weight (kg)"
+        />
+        <Input
+          type="number"
+          value={fitnessAssessment.height}
+          onChange={(e) =>
+            setFitnessAssessment({
+              ...fitnessAssessment,
+              height: e.target.value,
+            })
+          }
+          placeholder="Height (cm)"
+        />
+        <Input
+          value={fitnessAssessment.goal}
+          onChange={(e) =>
+            setFitnessAssessment({ ...fitnessAssessment, goal: e.target.value })
+          }
+          placeholder="Fitness Goal"
+        />
+        <Button
+          onClick={handleUpdateFitness}
+          disabled={loading}
+          className="mt-2 w-full"
+        >
+          {loading ? "Saving..." : "Update Fitness"}
+        </Button>
+      </Card>
     </div>
   );
 };
 
-export default ProfilePage;
+export default Profile;

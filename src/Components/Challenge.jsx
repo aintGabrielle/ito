@@ -13,8 +13,12 @@ import {
 import { toast } from "sonner";
 import { Pencil, Trash, Copy, CheckCircle } from "lucide-react";
 import Navbar from "./Navbar";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, BarChart, User, Dumbbell, LogOut } from "lucide-react"; // Sidebar Icons
+import WorkoutTracker from "./WorkoutTracker";
 
 const ChallengeManager = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [challenges, setChallenges] = useState([]);
   const [newChallenge, setNewChallenge] = useState({
     name: "",
@@ -191,141 +195,66 @@ const ChallengeManager = () => {
   };
 
   return (
-    <div className="flex justify-between">
-      <Navbar />
+    <div className="flex justify-between md:justify-normal flex-col md:flex-row overflow-hidden">
+      <div
+        className={`fixed md:relative z-40 bg-white shadow-xl h-screen flex flex-col p-6 w-64 transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 transition-transform duration-300 ease-in-out`}
+      >
+        <div className="flex items-center gap-3 mb-8">
+          <img src="/images/logo.png" className="w-12" alt="Logo" />
+          <h1 className="font-bold italic text-2xl text-green-500">
+            FitMission
+          </h1>
+        </div>
+
+        <nav className="flex flex-col space-y-4 flex-grow">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-3 text-lg hover:text-green-500"
+          >
+            <BarChart size={20} /> Dashboard
+          </Link>
+          <Link
+            to="/challenge"
+            className="flex items-center gap-3 text-lg hover:text-green-500"
+          >
+            <Dumbbell size={20} /> Tracker
+          </Link>
+
+          <Link
+            to="/chatbot"
+            className="flex items-center gap-3 text-lg hover:text-green-500"
+          >
+            🤖 AI Coach
+          </Link>
+          {/* <Link
+            to="/profile"
+            className="flex items-center gap-3 text-lg hover:text-green-500"
+          >
+            🏆 Profile
+          </Link> */}
+        </nav>
+
+        <div className="mt-auto">
+          <Button
+            className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center gap-2"
+            onClick={() => {
+              signOut();
+              navigate("/");
+            }}
+          >
+            <LogOut size={18} /> Sign Out
+          </Button>
+        </div>
+      </div>
       <div className="mx-auto p-6">
-        <h1 className="text-3xl font-bold text-center mb-6">
-          Challenge Manager
+        <h1 className="text-3xl font-bold text-center mb-6 text-green-400">
+          Track your Journey!
         </h1>
 
         {/* Create Challenge */}
-        <div className="flex flex-col gap-3 mb-6">
-          <Input
-            name="name"
-            placeholder="Challenge Name"
-            value={newChallenge.name}
-            onChange={handleChange}
-          />
-          <Input
-            name="description"
-            placeholder="Challenge Description"
-            value={newChallenge.description}
-            onChange={handleChange}
-          />
-          <Input
-            name="challenge_link"
-            placeholder="Paste the challenge link (Optional)"
-            value={newChallenge.challenge_link}
-            onChange={handleChange}
-          />
-          <Button onClick={createChallenge}>Create Challenge</Button>
-        </div>
-
-        {/* Challenge List */}
-        <div className="grid gap-4">
-          {challenges.map((challenge) => (
-            <Card key={challenge.id}>
-              <CardHeader className="flex justify-between">
-                <CardTitle>{challenge.name}</CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => openEditModal(challenge)}
-                  >
-                    <Pencil size={16} />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => deleteChallenge(challenge.id)}
-                  >
-                    <Trash size={16} />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => copyShareLink(challenge.id)}
-                  >
-                    <Copy size={16} />
-                  </Button>
-                  {!challenge.is_done && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => markAsDone(challenge.id)}
-                    >
-                      <CheckCircle size={16} />
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {challenge.description}
-                {challenge.is_done && (
-                  <span className="text-green-500"> - Done</span>
-                )}
-                {challenge.challenge_link && (
-                  <div className="mt-2">
-                    <label>Challenge Link:</label>
-                    <Input
-                      value={challenge.challenge_link}
-                      readOnly
-                      className="mt-1"
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Edit Challenge Modal */}
-        {editingChallenge && (
-          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Edit Challenge</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-3">
-                <Input
-                  name="name"
-                  value={editingChallenge.name}
-                  onChange={(e) =>
-                    setEditingChallenge({
-                      ...editingChallenge,
-                      name: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  name="description"
-                  value={editingChallenge.description}
-                  onChange={(e) =>
-                    setEditingChallenge({
-                      ...editingChallenge,
-                      description: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  name="challenge_link"
-                  value={editingChallenge.challenge_link}
-                  onChange={(e) =>
-                    setEditingChallenge({
-                      ...editingChallenge,
-                      challenge_link: e.target.value,
-                    })
-                  }
-                  placeholder="Paste the challenge link (Optional)"
-                />
-              </div>
-              <DialogFooter>
-                <Button onClick={updateChallenge}>Update</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+        <WorkoutTracker />
       </div>
     </div>
   );

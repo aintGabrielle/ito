@@ -40,7 +40,7 @@ const Navbar = () => {
     <div className="flex h-screen">
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 w-64 bg-white shadow-lg h-screen transform ${
+        className={`fixed top-0 left-0 w-fit bg-white shadow-lg h-screen transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:flex z-50`}
       >
@@ -64,7 +64,7 @@ const Navbar = () => {
               Dashboard
             </Link>
             <Link to="/challenge" className="hover:text-green-500">
-              Challenge
+              Tracker
             </Link>
             <Link to="/activity" className="hover:text-green-500">
               Activity
@@ -72,9 +72,9 @@ const Navbar = () => {
             <Link to="/chatbot" className="hover:text-green-500">
               Coach
             </Link>
-            <Link to="/profile" className="hover:text-green-500">
+            {/* <Link to="/profile" className="hover:text-green-500">
               Profile
-            </Link>
+            </Link> */}
           </nav>
           <div className="mt-auto">
             <h2 className="text-sm text-gray-500">
@@ -86,7 +86,7 @@ const Navbar = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col transition-all duration-300 md:ml-64">
+      <div className="flex-1 flex flex-col transition-all duration-300">
         <header className="bg-white shadow-md py-4 px-6 flex justify-between items-center md:hidden">
           <button className="p-2 text-gray-700" onClick={() => setIsOpen(true)}>
             <Menu size={24} />
