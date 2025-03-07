@@ -43,7 +43,7 @@ const Signup = () => {
             </div>
             <div>
               <p className="text-xl font-bold uppercase text-green-400">
-                Sign-UP
+                Start With us now!
               </p>
             </div>
           </div>
