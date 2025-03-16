@@ -56,24 +56,41 @@ export const AuthContextProvider = ({ children }) => {
         return { success: false, error: error.message };
       }
 
-      console.log("Sign-in successful:", data);
-      setSession(data.session);
-      setUser(data.user);
-      return { success: true, user: data.user };
+      const user = data.user;
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError || !profile) {
+        console.log("New user detected. Redirecting to assessment...");
+        return { success: true, isNewUser: true };
+      }
+
+      console.log("Existing user detected. Redirecting to dashboard...");
+      return { success: true, isNewUser: false };
     } catch (err) {
       console.error("Unexpected error during sign-in:", err);
       return { success: false, error: "Unexpected error during sign-in." };
     }
   };
 
-  // ✅ Sign In with Google
+  // sign in with Google
+
   const signInWithGoogle = async () => {
     try {
+      const redirectURL =
+        import.meta.env.MODE === "localhost"
+          ? "http://localhost:5173/dashboard"
+          : "https://fitmission-devops.vercel.app/dashboard";
+
+      console.log("Google Sign-In Redirecting to:", redirectURL);
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/assessment`,
-        },
+        options: { redirectTo: redirectURL },
       });
 
       if (error) {
@@ -81,21 +98,30 @@ export const AuthContextProvider = ({ children }) => {
         return { success: false, error: error.message };
       }
 
-      return { success: true, user: data.user };
+      return { success: true };
     } catch (err) {
       console.error("Unexpected error during Google Sign-in:", err);
-      return { success: false, error: "An unexpected error occurred." };
+      return {
+        success: false,
+        error: err.message || "An unexpected error occurred.",
+      };
     }
   };
 
-  // ✅ Sign Up with Google
+  // Sign Up with Google
+
   const signUpWithGoogle = async () => {
     try {
+      const redirectURL =
+        import.meta.env.MODE === "localhost"
+          ? "http://localhost:5173/assessment"
+          : "https://fitmission-devops.vercel.app/assessment";
+
+      console.log("Google Sign-Up Redirecting to:", redirectURL);
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/assessment`,
-        },
+        options: { redirectTo: redirectURL },
       });
 
       if (error) {
@@ -106,7 +132,10 @@ export const AuthContextProvider = ({ children }) => {
       return { success: true };
     } catch (err) {
       console.error("Unexpected error during Google Sign-up:", err);
-      return { success: false, error: "An unexpected error occurred." };
+      return {
+        success: false,
+        error: err.message || "An unexpected error occurred.",
+      };
     }
   };
 

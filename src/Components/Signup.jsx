@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
@@ -10,8 +10,36 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signUpNewUser, signUpWithGoogle } = useAuth();
+  const { signUpNewUser, signUpWithGoogle, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkUserExists = async () => {
+      if (!user) return;
+
+      console.log("Checking if user exists in database...");
+
+      const { data, error } = await supabase
+        .from("fitness_assessments")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking user:", error.message);
+      } else if (data) {
+        console.log("User found, redirecting to dashboard...");
+        navigate("/dashboard"); // ✅ Redirect returning users to dashboard
+      } else {
+        console.log("New user, redirecting to assessment...");
+        navigate("/assessment"); // ✅ Redirect new users to assessment
+      }
+
+      setLoading(false);
+    };
+
+    checkUserExists();
+  }, [user, navigate]);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -50,7 +78,7 @@ const Signup = () => {
 
       if (result.success) {
         console.log("Google Sign-up Successful:", result.user);
-        setTimeout(() => navigate("/assessment"), 1000); // Delay to ensure session updates
+        setTimeout(() => navigate("/assessment"), 1000); // ✅ Redirect new users to assessment
       } else {
         setError(result.error || "Google sign-up failed.");
       }

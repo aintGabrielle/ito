@@ -41,7 +41,11 @@ const Signin = () => {
 
       const result = await signInUser(email, password);
       if (result.success) {
-        navigate("/dashboard");
+        if (result.isNewUser) {
+          navigate("/dashboard");
+        } else {
+          navigate("/assessment");
+        }
       } else {
         setError(result.error || "Invalid email or password.");
       }
@@ -55,8 +59,22 @@ const Signin = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithGoogle();
+
       if (result.success) {
-        navigate("/dashboard");
+        const { user } = result;
+
+        // Check if the user exists in the profiles table
+        const { data: profile, error } = await supabase
+          .from("profiles") // Change "profiles" if necessary
+          .select("id")
+          .eq("id", user.id)
+          .single();
+
+        if (!profile) {
+          navigate("/assessment");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
         setError(result.error || "Google sign-in failed.");
       }
