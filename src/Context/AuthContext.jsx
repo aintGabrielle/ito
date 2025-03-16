@@ -104,12 +104,30 @@ export const AuthContextProvider = ({ children }) => {
       return { success: false, error: "An unexpected error occurred." };
     }
   };
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign-out error:", error.message);
+        return { success: false, error: error.message };
+      }
+
+      setSession(null);
+      setUser(null);
+      console.log("User signed out successfully.");
+      return { success: true };
+    } catch (err) {
+      console.error("Unexpected error during sign-out:", err);
+      return { success: false, error: "Unexpected error during sign-out." };
+    }
+  };
 
   return (
     <AuthContext.Provider
       value={{
         session,
         user,
+        signOut,
         signUpNewUser,
         signInUser,
         signInWithGoogle,
