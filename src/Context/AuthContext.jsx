@@ -9,28 +9,48 @@ export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const restoreSession = async () => {
+    const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
-        console.error("Error restoring session:", error.message);
+        console.error("Error getting session:", error.message);
+        return;
       }
+
       setSession(data?.session);
       setUser(data?.session?.user || null);
-      setLoading(false);
+
+      if (data?.session?.user) {
+        const isNewUser =
+          data.session.user.created_at === data.session.user.updated_at;
+        console.log(
+          "Redirecting user...",
+          isNewUser ? "/assessment" : "/dashboard"
+        );
+        navigate(isNewUser ? "/assessment" : "/dashboard");
+      }
     };
 
-    restoreSession();
+    checkSession();
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         console.log("Auth state changed:", session);
         setSession(session);
         setUser(session?.user || null);
+
+        if (session?.user) {
+          const isNewUser = session.user.created_at === session.user.updated_at;
+          console.log(
+            "Redirecting user after auth change...",
+            isNewUser ? "/assessment" : "/dashboard"
+          );
+          navigate(isNewUser ? "/assessment" : "/dashboard");
+        }
       }
     );
 
     return () => subscription?.subscription?.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   // ✅ Sign Up
   const signUpNewUser = async (email, password) => {
@@ -90,7 +110,6 @@ export const AuthContextProvider = ({ children }) => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        redirect_to: window.location.origin + "/assessment",
       });
 
       if (error) {
@@ -98,12 +117,13 @@ export const AuthContextProvider = ({ children }) => {
         return { success: false, error: error.message };
       }
 
-      return { success: true, user: data.user };
+      return { success: true };
     } catch (err) {
       console.error("Unexpected error during Google Sign-up:", err);
       return { success: false, error: "An unexpected error occurred." };
     }
   };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
