@@ -1,15 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signInUser } = useAuth();
+  const { signInUser, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -23,22 +33,35 @@ const Signin = () => {
     }
 
     try {
-      console.log("Signing in with:", email);
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", email);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
 
       const result = await signInUser(email, password);
-
       if (result.success) {
-        console.log("Login successful:", result.user);
         navigate("/dashboard");
       } else {
-        console.error("Login failed:", result.error);
         setError(result.error || "Invalid email or password.");
       }
     } catch (error) {
-      console.error("Unexpected error:", error);
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithGoogle();
+      if (result.success) {
+        navigate("/dashboard");
+      } else {
+        setError(result.error || "Google sign-in failed.");
+      }
+    } catch (error) {
+      setError("An unexpected error occurred.");
     }
   };
 
@@ -84,12 +107,38 @@ const Signin = () => {
             />
           </div>
 
+          <div className="flex items-center justify-between">
+            <label className="flex items-center text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+                className="mr-2"
+              />
+              Remember me
+            </label>
+            <Link
+              className="text-sm text-green-500 font-semibold"
+              to="/forgot-password"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-green-500 text-white py-2 rounded-lg text-lg font-semibold hover:bg-green-600 transition-all"
           >
             {loading ? "Signing in..." : "Sign In"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-2 bg-white border py-2 rounded-lg text-lg font-semibold shadow-md hover:bg-gray-100 transition-all"
+          >
+            <FcGoogle className="text-2xl" /> Sign in with Google
           </button>
 
           {error && (
