@@ -9,48 +9,28 @@ export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkSession = async () => {
+    const restoreSession = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
-        console.error("Error getting session:", error.message);
-        return;
+        console.error("Error restoring session:", error.message);
       }
-
       setSession(data?.session);
       setUser(data?.session?.user || null);
-
-      if (data?.session?.user) {
-        const isNewUser =
-          data.session.user.created_at === data.session.user.updated_at;
-        console.log(
-          "Redirecting user...",
-          isNewUser ? "/assessment" : "/dashboard"
-        );
-        navigate(isNewUser ? "/assessment" : "/dashboard");
-      }
+      setLoading(false);
     };
 
-    checkSession();
+    restoreSession();
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         console.log("Auth state changed:", session);
         setSession(session);
         setUser(session?.user || null);
-
-        if (session?.user) {
-          const isNewUser = session.user.created_at === session.user.updated_at;
-          console.log(
-            "Redirecting user after auth change...",
-            isNewUser ? "/assessment" : "/dashboard"
-          );
-          navigate(isNewUser ? "/assessment" : "/dashboard");
-        }
       }
     );
 
     return () => subscription?.subscription?.unsubscribe();
-  }, [navigate]);
+  }, []);
 
   // ✅ Sign Up
   const signUpNewUser = async (email, password) => {
