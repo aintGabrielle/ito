@@ -55,7 +55,7 @@ export default function FitnessAssessment() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 flex items-center justify-center px-6">
+    <div className="min-h-screen bg-green-400 flex items-center justify-center px-6">
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -202,7 +202,7 @@ export default function FitnessAssessment() {
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
             disabled={isSubmitting}
-            className="md:col-span-2 w-full bg-gradient-to-r from-red-500 to-pink-500 text-white p-3 rounded-lg font-bold text-lg shadow-md hover:shadow-xl transition-all"
+            className="md:col-span-2 w-full bg-green-400 text-white p-3 rounded-lg font-bold text-lg shadow-md hover:shadow-xl transition-all"
           >
             {isSubmitting ? "Submitting..." : "🚀 Submit"}
           </motion.button>
