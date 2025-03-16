@@ -42,11 +42,10 @@ export const AuthContextProvider = ({ children }) => {
     return { success: true, user: data.user };
   };
 
-  // ✅ Sign In (Proper Error Handling)
+  // ✅ Sign In
   const signInUser = async (email, password) => {
     try {
       console.log("Attempting login for:", email);
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -67,26 +66,11 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // ✅ Sign Out
-  const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setSession(null);
-      setUser(null);
-      console.log("User signed out successfully");
-    } catch (error) {
-      console.error("Sign-out error:", error.message);
-    }
-  };
-
-  // Sign In with Google
+  // ✅ Sign In with Google
   const signInWithGoogle = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/dashboard", // Adjust the redirect URL
-        },
       });
 
       if (error) {
@@ -101,6 +85,26 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // ✅ Sign Up with Google
+  const signUpWithGoogle = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        redirect_to: window.location.origin + "/assessment",
+      });
+
+      if (error) {
+        console.error("Google Sign-up Error:", error.message);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true, user: data.user };
+    } catch (err) {
+      console.error("Unexpected error during Google Sign-up:", err);
+      return { success: false, error: "An unexpected error occurred." };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -108,8 +112,8 @@ export const AuthContextProvider = ({ children }) => {
         user,
         signUpNewUser,
         signInUser,
-        signOut,
         signInWithGoogle,
+        signUpWithGoogle,
       }}
     >
       {!loading ? (

@@ -6,10 +6,11 @@ import { FcGoogle } from "react-icons/fc";
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signUpNewUser, signInWithGoogle } = useAuth();
+  const { signUpNewUser, signUpWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
@@ -17,8 +18,14 @@ const Signup = () => {
     setError("");
     setLoading(true);
 
-    if (!email || !password) {
-      setError("Email and password are required.");
+    if (!email || !password || !confirmPassword) {
+      setError("All fields are required.");
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
       setLoading(false);
       return;
     }
@@ -39,9 +46,11 @@ const Signup = () => {
 
   const handleGoogleSignUp = async () => {
     try {
-      const result = await signInWithGoogle();
+      const result = await signUpWithGoogle();
+
       if (result.success) {
-        navigate("/assessment");
+        console.log("Google Sign-up Successful:", result.user);
+        setTimeout(() => navigate("/assessment"), 1000); // Delay to ensure session updates
       } else {
         setError(result.error || "Google sign-up failed.");
       }
@@ -87,6 +96,20 @@ const Signup = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
+              className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-green-400 focus:border-green-400"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm your password"
               className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-green-400 focus:border-green-400"
               required
             />
