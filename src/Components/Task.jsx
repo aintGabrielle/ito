@@ -53,7 +53,7 @@ const Task = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-green-400">
+    <div className="flex md:flex-row h-screen bg-green-400">
       <Nav />
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <Card className="w-full max-w-md bg-white shadow-lg rounded-lg p-6 text-center">

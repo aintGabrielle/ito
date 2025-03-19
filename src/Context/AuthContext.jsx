@@ -115,7 +115,7 @@ export const AuthContextProvider = ({ children }) => {
       const redirectURL =
         import.meta.env.MODE === "localhost"
           ? "http://localhost:5173/assessment"
-          : "https://fitmission-devops.vercel.app/assessment";
+          : "https://fitmission-zeta.vercel.app/assessment";
 
       console.log("Google Sign-Up Redirecting to:", redirectURL);
 
