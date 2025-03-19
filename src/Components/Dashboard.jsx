@@ -389,8 +389,7 @@ const Dashboard = () => {
             <pre className="text-gray-800 whitespace-pre-wrap">{dietPlan}</pre>
           ) : (
             <p className="text-gray-500 text-center">
-              ⚠️ No diet plan available. Please complete your fitness
-              assessment.
+              ⚠️ Loading generated data, please wait...
             </p>
           )}
         </div>
