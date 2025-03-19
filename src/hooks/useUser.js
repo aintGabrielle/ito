@@ -6,25 +6,31 @@ const useUser = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) console.error(error);
-      setUser(data?.user || null);
+    const fetchSession = async () => {
+      console.log("Fetching session from Supabase...");
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("Error fetching session:", error.message);
+        setUser(null);
+      } else {
+        console.log("Session Data:", data);
+        setUser(data?.session?.user || null);
+      }
+
       setLoading(false);
     };
 
-    fetchUser();
+    fetchSession();
 
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        console.log("Auth state changed:", session);
         setUser(session?.user || null);
       }
     );
 
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
+    return () => listener?.subscription?.unsubscribe();
   }, []);
 
   return { user, loading };

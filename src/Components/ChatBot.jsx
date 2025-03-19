@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabaseClient";
 import axios from "axios";
 import { Input } from "./ui/input";
@@ -8,10 +8,7 @@ import { useAuth } from "@/Context/AuthContext";
 import { ScrollArea } from "./ui/scroll-area";
 import useUser from "../hooks/useUser";
 import { motion } from "framer-motion";
-import debounce from "lodash.debounce";
-import Navbar from "./Navbar";
-import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, BarChart, User, Dumbbell, LogOut } from "lucide-react"; // Sidebar Icons
+import Nav from "./Nav";
 import { Loader2 } from "lucide-react";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
@@ -19,14 +16,13 @@ const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const ChatBot = () => {
   const [input, setInput] = useState("");
   const { session, signOut } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: "bot", content: "Hello! How can I assist you today?" },
   ]);
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
-  const navigate = useNavigate();
-  const debounceRef = useRef(null);
+  const messagesEndRef = useRef(null); // ✅ Ref to track the bottom of the chat
+  const scrollContainerRef = useRef(null); // ✅ Ref for the scrollable area
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -41,11 +37,10 @@ const ChatBot = () => {
       if (error) {
         console.error("Error fetching messages:", error);
       } else {
-        console.log("Messages loaded from Supabase:", data);
         setMessages(
           data.map((msg) => ({
             role: msg.role,
-            content: msg.message, // Ensure it matches message state
+            content: msg.message,
           }))
         );
       }
@@ -60,14 +55,12 @@ const ChatBot = () => {
       return;
     }
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("chat_messages")
       .insert([{ user_id: user.id, role, message: content }]);
 
     if (error) {
-      console.error("Supabase Insert Error:", error);
-    } else {
-      console.log("Message saved to Supabase:", data);
+      console.error("Supabase Insert Error:", error.message);
     }
   };
 
@@ -120,99 +113,51 @@ const ChatBot = () => {
     setLoading(false);
   };
 
-  const debouncedFetchChatResponse = useCallback(
-    debounce((userInput) => {
-      fetchChatResponse(userInput);
-    }, 1500),
-    []
-  );
-
   const handleSendMessage = () => {
     if (!input.trim() || loading) return;
-    debouncedFetchChatResponse(input);
+    fetchChatResponse(input);
     setInput("");
   };
 
+  /** ✅ Auto-scroll to bottom whenever messages update */
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop =
+        scrollContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-green-400">
-      <div
-        className={`fixed md:relative z-40 bg-white shadow-xl h-screen flex flex-col p-6 w-64 transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 transition-transform duration-300 ease-in-out`}
-      >
-        <div className="flex items-center gap-3 mb-8">
-          <img src="/images/logo.png" className="w-12" alt="Logo" />
-          <h1 className="font-bold italic text-2xl text-green-500">
-            FitMission
-          </h1>
-        </div>
-
-        <nav className="flex flex-col space-y-4 flex-grow">
-          <Link
-            to="/dashboard"
-            className="flex items-center gap-3 text-lg hover:text-green-500"
+    <div className="flex  h-screen bg-green-400">
+      <Nav />
+      <div className="flex-1 flex flex-col items-center justify-between p-4 w-full max-w-[95%] md:max-w-3xl mx-auto h-full">
+        <Card className="w-full flex-grow rounded-2xl shadow-lg bg-white p-4 flex flex-col overflow-hidden min-h-[75vh]">
+          {/* ✅ Scrollable chat area with auto-scroll */}
+          <ScrollArea
+            ref={scrollContainerRef}
+            className="flex-1 overflow-auto p-2 max-h-[75vh] min-h-[65vh]"
           >
-            <BarChart size={20} /> Dashboard
-          </Link>
-          <Link
-            to="/challenge"
-            className="flex items-center gap-3 text-lg hover:text-green-500"
-          >
-            <Dumbbell size={20} /> Tracker
-          </Link>
-
-          <Link
-            to="/chatbot"
-            className="flex items-center gap-3 text-lg hover:text-green-500"
-          >
-            🤖 AI Coach
-          </Link>
-          {/* <Link
-            to="/profile"
-            className="flex items-center gap-3 text-lg hover:text-green-500"
-          >
-            🏆 Profile
-          </Link> */}
-        </nav>
-
-        <div className="mt-auto">
-          <Button
-            className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center gap-2"
-            onClick={() => {
-              signOut();
-              navigate("/");
-            }}
-          >
-            <LogOut size={18} /> Sign Out
-          </Button>
-        </div>
-      </div>
-      <div className="flex-1 flex flex-col items-center justify-between p-6 w-full max-w-4xl mx-auto min-h-[80vh]">
-        <Card className="w-full flex-grow rounded-2xl shadow-lg bg-white p-4 flex flex-col overflow-hidden">
-          <ScrollArea className="flex-1 overflow-auto p-2 max-h-[60vh]">
             {messages.map((msg, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className={`mb-2 p-3 rounded-xl max-w-xs text-sm shadow-md ${
+                className={`mb-2 p-3 rounded-xl text-sm shadow-md break-words ${
                   msg.role === "user"
-                    ? "bg-blue-600 text-white ml-auto"
-                    : "bg-gray-200 text-black"
+                    ? "bg-blue-600 text-white ml-auto max-w-[80%]"
+                    : "bg-gray-200 text-black max-w-[80%]"
                 }`}
               >
                 {msg.content}
               </motion.div>
             ))}
-            {loading && (
-              <div className="flex items-center gap-2 p-2 text-gray-500">
-                <Loader2 className="animate-spin" /> AI is thinking...
-              </div>
-            )}
+            {/* ✅ Invisible anchor to help scroll to bottom */}
+            <div ref={messagesEndRef} />
           </ScrollArea>
         </Card>
-        <div className="flex gap-2 w-full max-w-4xl mt-4 items-center flex-wrap sm:flex-nowrap">
+        {/* ✅ Input and Send Button always visible */}
+        <div className="flex gap-2 w-full max-w-3xl mt-4 items-center flex-wrap sm:flex-nowrap">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -223,7 +168,7 @@ const ChatBot = () => {
           <Button
             onClick={handleSendMessage}
             disabled={loading}
-            className="bg-white hover:bg-blue-700 text-black px-4 py-2 rounded-lg shadow-md w-full sm:w-auto"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md w-full sm:w-auto"
           >
             {loading ? <Loader2 className="animate-spin" /> : "Send"}
           </Button>

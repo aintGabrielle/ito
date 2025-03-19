@@ -1,40 +1,44 @@
 {
-    "routes":[
-        {
-            "src": "/",
-            "dest": "/"
-        },
-        {
-            "src": "/signin",
-            "dest": "/"
-        },
-        {
-            "src": "/signup",
-            "dest": "/"
-        },
-        {
-            "src": "/dashboard",
-            "dest": "/"
-        },
-        {
-            "src": "/assessment",
-            "dest": "/"
-        },
-        {
-            "src": "/challenge",
-            "dest": "/"
-        },
-        {
-            "src": "/chatbot",
-            "dest": "/"
-        },
-        {
-            "src": "/started-workout",
-            "dest": "/"
-        },
-        {
-            "src": "/activity",
-            "dest": "/"
-        }
-    ]
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/"
+    },
+    {
+      "src": "/signin",
+      "dest": "/"
+    },
+    {
+      "src": "/signup",
+      "dest": "/"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "/"
+    },
+    {
+      "src": "/assessment",
+      "dest": "/"
+    },
+    {
+      "src": "/challenge",
+      "dest": "/"
+    },
+    {
+      "src": "/chatbot",
+      "dest": "/"
+    },
+    {
+      "src": "/started-workout",
+      "dest": "/"
+    },
+    {
+      "src": "/activity",
+      "dest": "/"
+    },
+    {
+      "src": "/challenges",
+      "dest": "/"
+    }
+  ]
 }

@@ -1,167 +1,191 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import useUser from "../hooks/useUser";
-import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Card } from "./ui/card";
+import { Input } from "./ui/input";
 import { toast } from "sonner";
+import useUser from "../hooks/useUser";
+import Nav from "./Nav";
 
 const Profile = () => {
   const { user } = useUser();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [fitnessAssessment, setFitnessAssessment] = useState({
-    weight: "",
-    height: "",
-    goal: "",
-  });
+  const [assessment, setAssessment] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [updatedValues, setUpdatedValues] = useState({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) fetchProfileData();
+    if (user) fetchAssessment();
   }, [user]);
 
-  // Fetch user profile & fitness assessment
-  const fetchProfileData = async () => {
+  const fetchAssessment = async () => {
     if (!user) return;
 
-    setLoading(true);
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("first_name, last_name")
+    const { data, error } = await supabase
+      .from("fitness_assessments")
+      .select("*")
       .eq("user_id", user.id)
-      .single();
-
-    const { data: fitness, error: fitnessError } = await supabase
-      .from("fitness_assessment")
-      .select("weight, height, goal")
-      .eq("user_id", user.id)
-      .single();
-
-    if (profileError) console.error("Error fetching profile:", profileError);
-    if (fitnessError)
-      console.error("Error fetching fitness assessment:", fitnessError);
-
-    if (profile) {
-      setFirstName(profile.first_name || "");
-      setLastName(profile.last_name || "");
-    }
-    if (fitness) {
-      setFitnessAssessment({
-        weight: fitness.weight || "",
-        height: fitness.height || "",
-        goal: fitness.goal || "",
-      });
-    }
-    setLoading(false);
-  };
-
-  // Handle updating user profile
-  const handleUpdateProfile = async () => {
-    if (!user) return;
-
-    setLoading(true);
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(
-        { user_id: user.id, first_name: firstName, last_name: lastName },
-        { onConflict: ["user_id"] }
-      );
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile.");
+      console.error("Supabase Error:", error.message);
     } else {
-      toast.success("Profile updated successfully!");
+      console.log("Fetched Assessment Data:", data);
+      setAssessment(data);
+      setUpdatedValues(data || {});
     }
-    setLoading(false);
   };
 
-  // Handle updating fitness assessment
+  const handleEdit = (field) => {
+    setEditing(field);
+  };
+
+  const handleChange = (field, value) => {
+    setUpdatedValues((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleUpdateFitness = async () => {
     if (!user) return;
 
     setLoading(true);
     const { error } = await supabase
-      .from("fitness_assessment")
-      .upsert(
-        { user_id: user.id, ...fitnessAssessment },
-        { onConflict: ["user_id"] }
-      );
+      .from("fitness_assessments")
+      .update(updatedValues)
+      .eq("user_id", user.id);
 
     if (error) {
       console.error("Error updating fitness assessment:", error);
       toast.error("Failed to update fitness assessment.");
     } else {
-      toast.success("Fitness assessment updated!");
+      toast.success("Fitness assessment updated successfully!");
+      setEditing(null);
+      fetchAssessment(); // Refresh data
     }
     setLoading(false);
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen bg-gray-100 p-6 gap-6">
-      {/* User Profile Card */}
-      <Card className="w-full md:w-1/3 p-4">
-        <h3 className="text-lg font-bold mb-2">👤 User Profile</h3>
-        <Input
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          placeholder="First Name"
-        />
-        <Input
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          placeholder="Last Name"
-        />
-        <Button
-          onClick={handleUpdateProfile}
-          disabled={loading}
-          className="mt-2 w-full"
-        >
-          {loading ? "Saving..." : "Update Profile"}
-        </Button>
-      </Card>
+    <div className="flex md:flex-row min-h-screen bg-green-400 gap-6">
+      <Nav />
+      <div className="flex flex-col gap-3 items-center justify-center px-4 md:px-6 w-full">
+        <h1 className="text-3xl text-white font-semibold">
+          Your Fitness Statistics!
+        </h1>
 
-      {/* Fitness Assessment Card */}
-      <Card className="w-full md:w-1/3 p-4">
-        <h3 className="text-lg font-bold mb-2">💪 Fitness Assessment</h3>
+        {/* Fitness Assessment Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {assessment ? (
+            <>
+              <EditableStatCard
+                label="Height"
+                value={updatedValues.height}
+                field="height"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+              <EditableStatCard
+                label="Weight"
+                value={updatedValues.currentWeight}
+                field="currentWeight"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+              <EditableStatCard
+                label="Goal"
+                value={updatedValues.goal}
+                field="goal"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+              <EditableStatCard
+                label="Workout Level"
+                value={updatedValues.workoutLevel}
+                field="workoutLevel"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+              <EditableStatCard
+                label="Preferred Muscle Focus"
+                value={updatedValues.focusMuscle}
+                field="focusMuscle"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+              <EditableStatCard
+                label="Exercise Type"
+                value={updatedValues.exerciseType}
+                field="exerciseType"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+              <EditableStatCard
+                label="Daily Walking"
+                value={updatedValues.dailyWalking}
+                field="dailyWalking"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+              <EditableStatCard
+                label="Push-ups Capacity"
+                value={updatedValues.pushups}
+                field="pushups"
+                editing={editing}
+                onEdit={handleEdit}
+                onChange={handleChange}
+              />
+            </>
+          ) : (
+            <p className="text-gray-600">No fitness assessment found.</p>
+          )}
+        </div>
+
+        {/* Save Button */}
+        {editing && (
+          <Button onClick={handleUpdateFitness} className="mt-4">
+            {loading ? "Saving..." : "Save Changes"}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Editable Stat Card Component
+const EditableStatCard = ({
+  label,
+  value,
+  field,
+  editing,
+  onEdit,
+  onChange,
+}) => {
+  return (
+    <div className="bg-gradient-to-r from-blue-400 to-purple-600 p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all">
+      <h2 className="text-lg font-semibold text-white">{label}</h2>
+      {editing === field ? (
         <Input
-          type="number"
-          value={fitnessAssessment.weight}
-          onChange={(e) =>
-            setFitnessAssessment({
-              ...fitnessAssessment,
-              weight: e.target.value,
-            })
-          }
-          placeholder="Weight (kg)"
+          type="text"
+          value={value || ""}
+          onChange={(e) => onChange(field, e.target.value)}
+          className="mt-2 p-2 rounded-md w-full text-white"
         />
-        <Input
-          type="number"
-          value={fitnessAssessment.height}
-          onChange={(e) =>
-            setFitnessAssessment({
-              ...fitnessAssessment,
-              height: e.target.value,
-            })
-          }
-          placeholder="Height (cm)"
-        />
-        <Input
-          value={fitnessAssessment.goal}
-          onChange={(e) =>
-            setFitnessAssessment({ ...fitnessAssessment, goal: e.target.value })
-          }
-          placeholder="Fitness Goal"
-        />
-        <Button
-          onClick={handleUpdateFitness}
-          disabled={loading}
-          className="mt-2 w-full"
-        >
-          {loading ? "Saving..." : "Update Fitness"}
-        </Button>
-      </Card>
+      ) : (
+        <p className="text-xl font-bold text-white">{value || "N/A"}</p>
+      )}
+      <Button
+        className="mt-2 bg-white text-blue-600 hover:bg-gray-300"
+        onClick={() => onEdit(field)}
+      >
+        Edit
+      </Button>
     </div>
   );
 };

@@ -11,11 +11,29 @@ import StartedWorkout from "./Components/StartedWorkout";
 import ChatBot from "./Components/ChatBot";
 import TimeBasedChallenge from "./Components/Challenge";
 import FitnessAssessment from "./Components/Assessment";
+import Task from "./Components/Task";
+import Profile from "./Components/Profile";
 
 export const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/signin", element: <Signin /> },
   { path: "/signup", element: <Signup /> },
+  {
+    path: "/profile",
+    element: (
+      <PrivateRoute>
+        <Profile />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/challenges",
+    element: (
+      <PrivateRoute>
+        <Task />
+      </PrivateRoute>
+    ),
+  },
   {
     path: "/assessment",
     element: (
