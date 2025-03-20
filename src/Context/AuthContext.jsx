@@ -78,21 +78,18 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   // sign in with Google
-
   const signInWithGoogle = async () => {
     try {
       const redirectURL =
         import.meta.env.MODE === "localhost"
-          ? "http://localhost:5173/dashboard"
-          : "https://fitmission-zeta.vercel.app/assessment";
+          ? "http://localhost:5173/auth-redirect"
+          : "https://fitmission-zeta.vercel.app/auth-redirect"; // Consistent redirect to auth-redirect
 
       console.log("Google Sign-In Redirecting to:", redirectURL);
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectURL },
       });
-
       if (error) {
         console.error("Google Sign-in Error:", error.message);
         return { success: false, error: error.message };
@@ -107,23 +104,19 @@ export const AuthContextProvider = ({ children }) => {
       };
     }
   };
-
   // Sign Up with Google
-
   const signUpWithGoogle = async () => {
     try {
       const redirectURL =
         import.meta.env.MODE === "localhost"
-          ? "http://localhost:5173/assessment"
-          : "https://fitmission-zeta.vercel.app/assessment";
+          ? "http://localhost:5173/auth-redirect"
+          : "https://fitmission-zeta.vercel.app/auth-redirect"; // Consistent redirect to auth-redirect
 
       console.log("Google Sign-Up Redirecting to:", redirectURL);
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectURL },
       });
-
       if (error) {
         console.error("Google Sign-up Error:", error.message);
         return { success: false, error: error.message };
@@ -138,7 +131,6 @@ export const AuthContextProvider = ({ children }) => {
       };
     }
   };
-
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
