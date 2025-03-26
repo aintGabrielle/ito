@@ -20,8 +20,8 @@ const Signup = () => {
       console.log("Checking if user exists in database...");
 
       const { data, error } = await supabase
-        .from("user_profiles")
-        .select("id")
+        .from("fitness_assessments")
+        .select("user_id")
         .eq("user_id", user.id)
         .maybeSingle();
 

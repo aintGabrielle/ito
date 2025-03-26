@@ -65,9 +65,9 @@ const Signin = () => {
 
         // Check if the user exists in the profiles table
         const { data: profile, error } = await supabase
-          .from("user_profiles") // Change "profiles" if necessary
-          .select("id")
-          .eq("id", user.id)
+          .from("fitness_assessments") // Change "profiles" if necessary
+          .select("user_id")
+          .eq("user_id", user.id)
           .single();
 
         if (!profile) {

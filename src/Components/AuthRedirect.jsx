@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient"; // Adjust the import path as needed
+import { supabase } from "../supabaseClient";
 
 const AuthRedirect = () => {
   const navigate = useNavigate();
@@ -8,18 +8,37 @@ const AuthRedirect = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error("Error fetching session:", sessionError.message);
+        return navigate("/");
+      }
+
+      const user = session?.user;
 
       if (user) {
+        // ✅ If OAuth user (Google), redirect directly to dashboard
+        if (session?.provider_token) {
+          console.log("OAuth user detected. Redirecting to dashboard...");
+          return navigate("/dashboard");
+        }
+
         try {
           const { data: profile, error: profileError } = await supabase
-            .from("user_profiles")
-            .select("id")
-            .eq("id", user.id)
-            .single();
+            .from("fitness_assessments")
+            .select("user_id")
+            .eq("user_id", user.id)
+            .maybeSingle();
 
-          if (profileError || !profile) {
+          if (profileError) {
+            console.error("Error fetching profile:", profileError.message);
+            return navigate("/");
+          }
+
+          if (!profile) {
             console.log("New user detected. Redirecting to assessment...");
             navigate("/assessment");
           } else {
@@ -28,12 +47,11 @@ const AuthRedirect = () => {
           }
         } catch (error) {
           console.error("Error checking profile:", error);
-          // Handle error appropriately, maybe redirect to an error page
-          navigate("/"); // Or an error page
+          navigate("/");
         }
       } else {
         // No user, redirect to login or home
-        navigate("/"); // Or your login page
+        navigate("/");
       }
     };
 
@@ -41,9 +59,8 @@ const AuthRedirect = () => {
   }, [navigate]);
 
   return (
-    <div>
-      {/* You can add a loading indicator here if you want */}
-      <p>Checking authentication...</p>
+    <div className="text-center py-10 text-lg text-gray-600">
+      Checking authentication...
     </div>
   );
 };
