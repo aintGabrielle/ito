@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "./index.css";
 import { supabase } from "../supabaseClient";
 // import OpenAI from 'openai'; // Uncomment if you have the SDK installed
 import { Line } from "react-chartjs-2";
