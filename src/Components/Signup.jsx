@@ -20,7 +20,7 @@ const Signup = () => {
       console.log("Checking if user exists in database...");
 
       const { data, error } = await supabase
-        .from("fitness_assessments")
+        .from("user_profiles")
         .select("id")
         .eq("user_id", user.id)
         .maybeSingle();
@@ -32,7 +32,7 @@ const Signup = () => {
         navigate("/dashboard"); // ✅ Redirect returning users to dashboard
       } else {
         console.log("New user, redirecting to assessment...");
-        navigate("/assessment"); // ✅ Redirect new users to assessment
+        navigate("/dashboard"); // ✅ Redirect new users to assessment
       }
 
       setLoading(false);
@@ -61,7 +61,7 @@ const Signup = () => {
     try {
       const result = await signUpNewUser(email, password);
       if (result.success) {
-        navigate("/assessment");
+        navigate("/dashboard");
       } else {
         setError(result.error || "Signup failed. Try again.");
       }
@@ -78,7 +78,7 @@ const Signup = () => {
 
       if (result.success) {
         console.log("Google Sign-up Successful:", result.user);
-        setTimeout(() => navigate("/assessment"), 1000); // ✅ Redirect new users to assessment
+        setTimeout(() => navigate("/dashboard"), 1000); // ✅ Redirect new users to assessment
       } else {
         setError(result.error || "Google sign-up failed.");
       }

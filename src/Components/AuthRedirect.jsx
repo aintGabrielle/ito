@@ -14,7 +14,7 @@ const AuthRedirect = () => {
       if (user) {
         try {
           const { data: profile, error: profileError } = await supabase
-            .from("profiles")
+            .from("user_profiles")
             .select("id")
             .eq("id", user.id)
             .single();
@@ -29,7 +29,7 @@ const AuthRedirect = () => {
         } catch (error) {
           console.error("Error checking profile:", error);
           // Handle error appropriately, maybe redirect to an error page
-          navigate("/assessment"); // Or an error page
+          navigate("/"); // Or an error page
         }
       } else {
         // No user, redirect to login or home

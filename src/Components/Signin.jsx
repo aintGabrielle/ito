@@ -10,7 +10,7 @@ const Signin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signInUser, signInWithGoogle } = useAuth();
+  const { signInUser, signInWithGoogle, signUpWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,14 +58,14 @@ const Signin = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signInWithGoogle();
+      const result = await signUpWithGoogle();
 
       if (result.success) {
         const { user } = result;
 
         // Check if the user exists in the profiles table
         const { data: profile, error } = await supabase
-          .from("profiles") // Change "profiles" if necessary
+          .from("user_profiles") // Change "profiles" if necessary
           .select("id")
           .eq("id", user.id)
           .single();

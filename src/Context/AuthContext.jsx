@@ -59,7 +59,7 @@ export const AuthContextProvider = ({ children }) => {
       const user = data.user;
 
       const { data: profile, error: profileError } = await supabase
-        .from("profiles")
+        .from("user_profiles")
         .select("id")
         .eq("id", user.id)
         .single();
@@ -83,15 +83,19 @@ export const AuthContextProvider = ({ children }) => {
       const redirectURL =
         import.meta.env.MODE === "localhost"
           ? "http://localhost:5173/auth-redirect"
-          : "https://fitmission-zeta.vercel.app/auth-redirect"; // Consistent redirect to auth-redirect
+          : "https://fitmission-zeta.vercel.app/auth-redirect";
 
       console.log("Google Sign-In Redirecting to:", redirectURL);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectURL },
       });
+
+      console.log("Supabase Response Data:", data); // Log the data
+      console.log("Supabase Response Error:", error); // Log the error
+
       if (error) {
-        console.error("Google Sign-in Error:", error.message);
+        console.error("Supabase Sign-in Error:", error);
         return { success: false, error: error.message };
       }
 
