@@ -6,7 +6,6 @@ import { supabase } from "../supabaseClient";
 import axios from "axios";
 
 const EnhancedSuggestions = () => {
-  const [user, setUser] = useState(null);
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,40 +13,38 @@ const EnhancedSuggestions = () => {
   const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchData = async () => {
+      console.log("🔄 Starting AI suggestion fetch...");
+
+      // Get current user
       const {
         data: { user },
-        error,
+        error: userError,
       } = await supabase.auth.getUser();
 
-      if (error || !user) {
-        console.error("User not found, cannot fetch assessment.");
+      if (userError || !user) {
+        console.error("❌ User not found, cannot fetch assessment.");
         setLoading(false);
         return;
       }
 
-      setUser(user);
-    };
+      console.log("✅ User found:", user.id);
 
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    const fetchAssessmentAndGenerateSuggestions = async () => {
-      if (!user) return;
-
-      const { data: assessments, error } = await supabase
+      // Fetch assessment data
+      const { data: assessments, error: assessmentError } = await supabase
         .from("fitness_assessments")
         .select("*")
         .eq("user_id", user.id)
         .limit(1)
         .single();
 
-      if (error || !assessments) {
-        console.error("Error fetching assessment:", error);
+      if (assessmentError || !assessments) {
+        console.error("❌ Error fetching assessment:", assessmentError);
         setLoading(false);
         return;
       }
+
+      console.log("✅ Fetched assessment data:", assessments);
 
       const prompt = `Based on this fitness assessment data:\n\n${JSON.stringify(
         assessments
@@ -77,30 +74,29 @@ const EnhancedSuggestions = () => {
 
         const text = res.data.choices[0].message.content;
 
-        // Try to extract just the JSON block
+        // Safely extract JSON
         const jsonStart = text.indexOf("[");
         const jsonEnd = text.lastIndexOf("]") + 1;
 
         if (jsonStart === -1 || jsonEnd === -1) {
-          throw new Error("Failed to parse JSON from AI response");
+          throw new Error("⚠️ Failed to parse JSON from AI response");
         }
 
-        const jsonText = text.substring(jsonStart, jsonEnd);
-        const suggestions = JSON.parse(jsonText);
-
+        const suggestions = JSON.parse(text.substring(jsonStart, jsonEnd));
         setCards(suggestions);
+        console.log("✅ AI Suggestions Loaded:", suggestions.length);
       } catch (err) {
-        console.error("OpenAI Error:", err);
+        console.error("❌ OpenAI Error:", err);
       }
 
       setLoading(false);
     };
 
-    fetchAssessmentAndGenerateSuggestions();
-  }, [user]);
+    fetchData();
+  }, []);
 
   const handleCardClick = (card) => {
-    setSelectedCard(card.id === selectedCard?.id ? null : card);
+    setSelectedCard(card.title === selectedCard?.title ? null : card);
   };
 
   const renderCards = (type) => {
@@ -118,7 +114,9 @@ const EnhancedSuggestions = () => {
           >
             <Card className="overflow-hidden shadow-lg rounded-2xl hover:shadow-xl transition-shadow duration-300">
               <img
-                src={`https://source.unsplash.com/featured/?${item.type},${item.title}`}
+                src={`https://source.unsplash.com/featured/?${
+                  item.type
+                },${encodeURIComponent(item.title)}`}
                 alt={item.title}
                 className="w-full h-40 object-cover"
               />
@@ -146,12 +144,20 @@ const EnhancedSuggestions = () => {
         <h2 className="text-3xl font-bold mb-6 text-green-700">
           💪 AI-Suggested Workouts
         </h2>
-        {loading ? <p>Loading workouts...</p> : renderCards("workout")}
+        {loading ? (
+          <p className="text-gray-500 text-center">Generating workouts...</p>
+        ) : (
+          renderCards("workout")
+        )}
 
         <h2 className="text-3xl font-bold my-8 text-green-700">
           🥗 AI-Suggested Diet Plans
         </h2>
-        {loading ? <p>Loading diets...</p> : renderCards("diet")}
+        {loading ? (
+          <p className="text-gray-500 text-center">Generating diets...</p>
+        ) : (
+          renderCards("diet")
+        )}
       </div>
     </div>
   );
