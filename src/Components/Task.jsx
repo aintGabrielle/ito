@@ -4,24 +4,42 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import Nav from "./Nav";
 import { supabase } from "../supabaseClient";
 import axios from "axios";
-import { useAuth } from "@/Context/AuthContext";
 
 const EnhancedSuggestions = () => {
+  const [user, setUser] = useState(null);
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
-  const { session } = useAuth();
   const [loading, setLoading] = useState(true);
 
   const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        console.error("User not found, cannot fetch assessment.");
+        setLoading(false);
+        return;
+      }
+
+      setUser(user);
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
     const fetchAssessmentAndGenerateSuggestions = async () => {
-      if (!session?.user) return;
+      if (!user) return;
 
       const { data: assessments, error } = await supabase
         .from("fitness_assessments")
         .select("*")
-        .eq("user_id", session.user.id)
+        .eq("user_id", user.id)
         .limit(1)
         .single();
 
@@ -33,7 +51,7 @@ const EnhancedSuggestions = () => {
 
       const prompt = `Based on this fitness assessment data:\n\n${JSON.stringify(
         assessments
-      )}\n\nGenerate 20 personalized workout suggestions and 20 personalized diet suggestions.\n\nFor each item, return:\n- title (string)\n- description (1–2 sentences)\n- type: either \"workout\" or \"diet\"\n\nRespond in JSON format as an array.`;
+      )}\n\nGenerate 20 personalized workout suggestions and 20 personalized diet suggestions.\n\nFor each item, return:\n- title (string)\n- description (1–2 sentences)\n- type: either "workout" or "diet"\n\nRespond in JSON format as an array.`;
 
       try {
         const res = await axios.post(
@@ -79,7 +97,7 @@ const EnhancedSuggestions = () => {
     };
 
     fetchAssessmentAndGenerateSuggestions();
-  }, [session]);
+  }, [user]);
 
   const handleCardClick = (card) => {
     setSelectedCard(card.id === selectedCard?.id ? null : card);
