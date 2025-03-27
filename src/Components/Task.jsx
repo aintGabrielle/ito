@@ -103,7 +103,7 @@ const EnhancedSuggestions = () => {
     const filtered = cards.filter((c) => c.type === type);
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="flex flex-col md:flex-row gap-6">
         {filtered.map((item, i) => (
           <motion.div
             key={i}
