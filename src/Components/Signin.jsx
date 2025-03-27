@@ -10,7 +10,7 @@ const Signin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signInUser, signInWithGoogle } = useAuth();
+  const { signInUser, signInWithGoogle, signUpWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,16 +58,16 @@ const Signin = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signInWithGoogle();
+      const result = await signUpWithGoogle();
 
       if (result.success) {
         const { user } = result;
 
         // Check if the user exists in the profiles table
         const { data: profile, error } = await supabase
-          .from("profiles") // Change "profiles" if necessary
-          .select("id")
-          .eq("id", user.id)
+          .from("fitness_assessments") // Change "profiles" if necessary
+          .select("user_id")
+          .eq("user_id", user.id)
           .single();
 
         if (!profile) {
@@ -79,7 +79,7 @@ const Signin = () => {
         setError(result.error || "Google sign-in failed.");
       }
     } catch (error) {
-      setError("An unexpected error occurred.");
+      setError("");
     }
   };
 
@@ -158,10 +158,6 @@ const Signin = () => {
           >
             <FcGoogle className="text-2xl" /> Sign in with Google
           </button>
-
-          {error && (
-            <p className="text-red-500 text-sm text-center mt-2">{error}</p>
-          )}
 
           <div className="text-center mt-3">
             <p className="text-gray-600">

@@ -32,7 +32,7 @@ export const AuthContextProvider = ({ children }) => {
     return () => subscription?.subscription?.unsubscribe();
   }, []);
 
-  // ✅ Sign Up
+  // ✅ Sign Up with Email/Password
   const signUpNewUser = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
@@ -42,7 +42,7 @@ export const AuthContextProvider = ({ children }) => {
     return { success: true, user: data.user };
   };
 
-  // ✅ Sign In
+  // ✅ Sign In with Email/Password
   const signInUser = async (email, password) => {
     try {
       console.log("Attempting login for:", email);
@@ -56,15 +56,27 @@ export const AuthContextProvider = ({ children }) => {
         return { success: false, error: error.message };
       }
 
+      const session = data.session;
       const user = data.user;
 
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", user.id)
-        .single();
+      // ✅ Skip new-user check if OAuth user
+      if (session?.provider_token) {
+        console.log("OAuth login detected. Redirecting to dashboard...");
+        return { success: true, isNewUser: false };
+      }
 
-      if (profileError || !profile) {
+      const { data: profile, error: profileError } = await supabase
+        .from("fitness_assessments")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error("Profile check error:", profileError.message);
+        return { success: true, isNewUser: true };
+      }
+
+      if (!profile) {
         console.log("New user detected. Redirecting to assessment...");
         return { success: true, isNewUser: true };
       }
@@ -77,17 +89,15 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // sign in with Google
-
+  // ✅ Sign In with Google (OAuth)
   const signInWithGoogle = async () => {
     try {
       const redirectURL =
         import.meta.env.MODE === "localhost"
-          ? "http://localhost:5173/dashboard"
-          : "https://fitmission-zeta.vercel.app/assessment";
+          ? "http://localhost:5174/auth-redirect"
+          : "https://fitmission-zeta.vercel.app/auth-redirect";
 
       console.log("Google Sign-In Redirecting to:", redirectURL);
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectURL },
@@ -108,17 +118,15 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // Sign Up with Google
-
+  // ✅ Sign Up with Google (same as sign-in in Supabase OAuth)
   const signUpWithGoogle = async () => {
     try {
       const redirectURL =
         import.meta.env.MODE === "localhost"
-          ? "http://localhost:5173/assessment"
-          : "https://fitmission-zeta.vercel.app/assessment";
+          ? "http://localhost:5173/auth-redirect"
+          : "https://fitmission-zeta.vercel.app/auth-redirect";
 
       console.log("Google Sign-Up Redirecting to:", redirectURL);
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectURL },
@@ -139,6 +147,7 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // ✅ Sign Out
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();

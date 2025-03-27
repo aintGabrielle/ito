@@ -39,6 +39,14 @@
     {
       "src": "/challenges",
       "dest": "/"
+    },
+    {
+      "src": "/profile",
+      "dest": "/"
+    },
+    {
+      "src": "/auth-redirect",
+      "dest": "/"
     }
   ]
 }

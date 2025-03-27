@@ -13,7 +13,11 @@ import TimeBasedChallenge from "./Components/Challenge";
 import FitnessAssessment from "./Components/Assessment";
 import Task from "./Components/Task";
 import Profile from "./Components/Profile";
+<<<<<<< HEAD
 import Forum from "./Components/Forum";
+=======
+import AuthRedirect from "./Components/AuthRedirect";
+>>>>>>> b779e62d3cb00c8b5c1f79a2419eddb496746cec
 
 export const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -99,5 +103,9 @@ export const router = createBrowserRouter([
         <Dashboard />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/auth-redirect",
+    element: <AuthRedirect />,
   },
 ]);
