@@ -4,6 +4,9 @@ export default {
     content: ["./src/**/*.{jsx, html}"],
   theme: {
   	extend: {
+		backgroundImage:{
+			'bg-image': "/images/fitness.png"
+		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
