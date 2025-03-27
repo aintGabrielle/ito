@@ -14,6 +14,7 @@ import FitnessAssessment from "./Components/Assessment";
 import Task from "./Components/Task";
 import Profile from "./Components/Profile";
 import AuthRedirect from "./Components/AuthRedirect";
+import Forum from "./Components/Forum";
 
 export const router = createBrowserRouter([
   { path: "/", element: <App /> },
