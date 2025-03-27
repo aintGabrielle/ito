@@ -128,7 +128,7 @@ const ChatBot = () => {
   }, [messages]);
 
   return (
-    <div className="flex  h-screen bg-green-400">
+    <div className="flex  h-screen bg-[url(/images/fitnesss.png)] bg-cover">
       <Nav />
       <div className="flex-1 flex flex-col items-center justify-between p-4 w-full max-w-[95%] md:max-w-3xl mx-auto h-full">
         <Card className="w-full flex-grow rounded-2xl shadow-lg bg-white p-4 flex flex-col overflow-hidden min-h-[75vh]">
