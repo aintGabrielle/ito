@@ -12,31 +12,32 @@ const EnhancedSuggestions = () => {
 
   const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
-  // ✅ Fallback keyword mapper for images
+  // ✅ More reliable Unsplash image keywords
   const getImageURL = (item) => {
     const keywordMap = {
-      HIIT: "hiit workout",
-      "Strength Training Circuit": "weightlifting",
+      HIIT: "hiit",
+      "Strength Training Circuit": "strength training",
       "Yoga or Pilates": "yoga",
       Swimming: "swimming",
       Cycling: "cycling",
       Running: "running",
       Jogging: "jogging",
-      "Outdoor Jogging": "jogging outdoors",
-      "Bodyweight Exercises": "bodyweight training",
-      "Interval Running": "interval training",
+      "Outdoor Jogging": "jogging outdoor",
+      "Bodyweight Exercises": "bodyweight workout",
+      "Interval Running": "interval running",
       "Resistance Band Training": "resistance band",
-      "Core Strengthening": "core workout",
-      Pilates: "pilates",
+      "Core Strengthening": "core exercise",
       "Upper Body Split": "upper body workout",
+      "Full Body Workout": "full body training",
     };
 
     const keyword =
       keywordMap[item.title] ||
-      item.title.split(" ").slice(0, 2).join(" ") ||
+      item.title.split(" ").slice(0, 2).join(" ").toLowerCase() ||
       "fitness";
 
-    return `https://source.unsplash.com/featured/?${item.type},${keyword}`;
+    // ✅ Use random instead of featured for reliability
+    return `https://source.unsplash.com/random/800x600/?${item.type},${keyword}`;
   };
 
   useEffect(() => {
@@ -137,7 +138,7 @@ const EnhancedSuggestions = () => {
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src =
-                    "https://source.unsplash.com/featured/?fitness";
+                    "https://source.unsplash.com/random/800x600/?fitness";
                 }}
               />
               <CardHeader className="bg-white p-4">
