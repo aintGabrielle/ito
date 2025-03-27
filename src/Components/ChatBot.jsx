@@ -80,7 +80,7 @@ const ChatBot = () => {
         {
           model: "gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You are a helpful AI." },
+            { role: "system", content: "You are a helpful AI, but only talks about Fitness and Diets" },
             { role: "user", content: userInput },
           ],
           temperature: 0.7,
