@@ -95,6 +95,12 @@ const Nav = () => {
           >
             <Dumbbell size={20} /> Profile
           </Link>
+          <Link
+            to="/forum"
+            className="flex items-center gap-3 text-lg hover:text-green-500"
+          >
+            <Dumbbell size={20} /> Forum
+          </Link>
         </nav>
 
         <div className="mt-auto">
