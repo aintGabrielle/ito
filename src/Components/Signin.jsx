@@ -79,7 +79,7 @@ const Signin = () => {
         setError(result.error || "Google sign-in failed.");
       }
     } catch (error) {
-      setError("An unexpected error occurred.");
+      setError("");
     }
   };
 
@@ -158,10 +158,6 @@ const Signin = () => {
           >
             <FcGoogle className="text-2xl" /> Sign in with Google
           </button>
-
-          {error && (
-            <p className="text-red-500 text-sm text-center mt-2">{error}</p>
-          )}
 
           <div className="text-center mt-3">
             <p className="text-gray-600">
