@@ -58,7 +58,17 @@ const EnhancedSuggestions = () => {
         );
 
         const text = res.data.choices[0].message.content;
-        const suggestions = JSON.parse(text);
+
+        // Try to extract just the JSON block
+        const jsonStart = text.indexOf("[");
+        const jsonEnd = text.lastIndexOf("]") + 1;
+
+        if (jsonStart === -1 || jsonEnd === -1) {
+          throw new Error("Failed to parse JSON from AI response");
+        }
+
+        const jsonText = text.substring(jsonStart, jsonEnd);
+        const suggestions = JSON.parse(jsonText);
 
         setCards(suggestions);
       } catch (err) {
