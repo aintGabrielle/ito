@@ -6,9 +6,9 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { supabase } from "../supabaseClient";
 import Nav from "./Nav";
-import Movement from "./Movement";
 import OpenAI from "openai";
 import { Line } from "react-chartjs-2";
+import TodaysFocus from "./TodayFocus";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -336,7 +336,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        <Movement />
+        <TodaysFocus />
 
         {/* 🤖 AI-Generated Diet Plan */}
         <div className="mt-6 bg-white p-6 rounded-lg shadow-lg w-full">

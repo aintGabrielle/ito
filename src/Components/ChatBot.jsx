@@ -36,7 +36,7 @@ const ChatBot = () => {
 
       if (error) {
         console.error("Error fetching messages:", error);
-      } else {
+      } else if (data && data.length > 0) {
         setMessages(
           data.map((msg) => ({
             role: msg.role,
