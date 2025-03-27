@@ -168,7 +168,7 @@ const EditableStatCard = ({
   onChange,
 }) => {
   return (
-    <div className="bg-gradient-to-r from-blue-400 to-purple-600 p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all">
+    <div className="bg-gradient-to-r from-green-400 to-green-600 p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all">
       <h2 className="text-lg font-semibold text-white">{label}</h2>
       {editing === field ? (
         <Input
