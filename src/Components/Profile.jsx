@@ -66,10 +66,13 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex md:flex-row min-h-screen bg-green-400 gap-6">
+    <div className="flex md:flex-row min-h-screen bg-[url(/images/fitnesss.png)] bg-cover gap-6 bg-[url">
+      {/* <div className="absolute z-20 w-full h-full top-0 left-0">
+        <img src="/images/fitness.png" className="w-full h-full" alt="" />
+      </div> */}
       <Nav />
       <div className="flex flex-col gap-3 items-center justify-center px-4 md:px-6 w-full">
-        <h1 className="text-3xl text-white font-semibold">
+        <h1 className="text-3xl text-green-600 font-semibold">
           Your Fitness Statistics!
         </h1>
 
