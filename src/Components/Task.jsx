@@ -1,129 +1,132 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Loader2, Repeat, CheckCircle } from "lucide-react";
 import Nav from "./Nav";
+import { supabase } from "../supabaseClient";
+import axios from "axios";
+import { useAuth } from "@/Context/AuthContext";
 
-const exercises = [
-  { name: "Push-ups", reps: "15" },
-  { name: "Squats", reps: "20" },
-  { name: "Jumping Jacks", reps: "30" },
-  { name: "Sit-ups", reps: "15" },
-  { name: "Lunges", reps: "10 per leg" },
-  { name: "Plank", reps: "30 seconds" },
-  { name: "Burpees", reps: "10" },
-];
+const EnhancedSuggestions = () => {
+  const [cards, setCards] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const { session } = useAuth();
+  const [loading, setLoading] = useState(true);
 
-const Task = () => {
-  const [currentChallenge, setCurrentChallenge] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [isActive, setIsActive] = useState(false);
-  const [completedChallenges, setCompletedChallenges] = useState(0);
+  const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
-  // Function to start or restart a challenge
-  const startChallenge = () => {
-    const randomIndex = Math.floor(Math.random() * exercises.length);
-    setCurrentChallenge(exercises[randomIndex]);
-    setTimeLeft(30);
-    setIsActive(true);
-  };
-
-  // Function to restart the challenge without changing exercise
-  const restartChallenge = () => {
-    setTimeLeft(30);
-    setIsActive(true);
-  };
-
-  // Countdown Timer
   useEffect(() => {
-    let timer;
-    if (isActive && timeLeft > 0) {
-      timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    } else if (timeLeft === 0) {
-      setIsActive(false); // Stop timer when it reaches 0
-    }
-    return () => clearTimeout(timer);
-  }, [isActive, timeLeft]);
+    const fetchAssessmentAndGenerateSuggestions = async () => {
+      if (!session?.user) return;
 
-  // Mark challenge as completed
-  const completeChallenge = () => {
-    setCompletedChallenges(completedChallenges + 1);
-    setIsActive(false);
+      const { data: assessments, error } = await supabase
+        .from("fitness_assessments")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .limit(1)
+        .single();
+
+      if (error || !assessments) {
+        console.error("Error fetching assessment:", error);
+        setLoading(false);
+        return;
+      }
+
+      const prompt = `Based on this fitness assessment data:\n\n${JSON.stringify(
+        assessments
+      )}\n\nGenerate 20 personalized workout suggestions and 20 personalized diet suggestions.\n\nFor each item, return:\n- title (string)\n- description (1–2 sentences)\n- type: either \"workout\" or \"diet\"\n\nRespond in JSON format as an array.`;
+
+      try {
+        const res = await axios.post(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            model: "gpt-3.5-turbo",
+            messages: [
+              {
+                role: "system",
+                content: "You are a helpful AI fitness assistant.",
+              },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.7,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${API_KEY}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const text = res.data.choices[0].message.content;
+        const suggestions = JSON.parse(text);
+
+        setCards(suggestions);
+      } catch (err) {
+        console.error("OpenAI Error:", err);
+      }
+
+      setLoading(false);
+    };
+
+    fetchAssessmentAndGenerateSuggestions();
+  }, [session]);
+
+  const handleCardClick = (card) => {
+    setSelectedCard(card.id === selectedCard?.id ? null : card);
+  };
+
+  const renderCards = (type) => {
+    const filtered = cards.filter((c) => c.type === type);
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {filtered.map((item, i) => (
+          <motion.div
+            key={i}
+            layout
+            whileTap={{ scale: 0.97 }}
+            onClick={() => handleCardClick(item)}
+            className="cursor-pointer"
+          >
+            <Card className="overflow-hidden shadow-lg rounded-2xl hover:shadow-xl transition-shadow duration-300">
+              <img
+                src={`https://source.unsplash.com/featured/?${item.type},${item.title}`}
+                alt={item.title}
+                className="w-full h-40 object-cover"
+              />
+              <CardHeader className="bg-white p-4">
+                <CardTitle className="text-xl font-semibold text-gray-800">
+                  {item.title}
+                </CardTitle>
+              </CardHeader>
+              {selectedCard?.title === item.title && (
+                <CardContent className="bg-gray-50 p-4 text-sm text-gray-600">
+                  {item.description}
+                </CardContent>
+              )}
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="flex md:flex-row h-screen bg-green-400">
+    <div className="flex flex-col h-full bg-green-100 min-h-screen">
       <Nav />
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
-        <Card className="w-full max-w-md bg-white shadow-lg rounded-lg p-6 text-center">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-green-500">
-              🎯 Fitness Challenge
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {currentChallenge ? (
-              <>
-                <motion.div
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-xl font-semibold"
-                >
-                  {currentChallenge.name}:{" "}
-                  <span className="text-blue-600">{currentChallenge.reps}</span>
-                </motion.div>
-                <p className="text-gray-500 text-sm mt-2">
-                  Time left: {timeLeft}s
-                </p>
-                <div className="flex flex-wrap gap-4 mt-4 justify-center">
-                  {timeLeft > 0 ? (
-                    <>
-                      <Button
-                        onClick={completeChallenge}
-                        className="bg-green-500 text-white"
-                      >
-                        <CheckCircle className="mr-2" /> Complete!
-                      </Button>
-                      <Button
-                        onClick={restartChallenge}
-                        className="bg-yellow-500 text-white"
-                      >
-                        <Repeat className="mr-2" /> Restart
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      onClick={startChallenge}
-                      className="bg-red-500 text-white"
-                    >
-                      <Repeat className="mr-2" /> Try Again
-                    </Button>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="text-gray-500">
-                  Click below to start your challenge!
-                </p>
-                <Button
-                  onClick={startChallenge}
-                  className="mt-4 bg-blue-500 text-white"
-                >
-                  Start Challenge
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <p className="text-gray-600 mt-4 text-sm">
-          Completed Challenges: {completedChallenges}
-        </p>
+      <div className="px-6 py-8 max-w-7xl mx-auto w-full">
+        <h2 className="text-3xl font-bold mb-6 text-green-700">
+          💪 AI-Suggested Workouts
+        </h2>
+        {loading ? <p>Loading workouts...</p> : renderCards("workout")}
+
+        <h2 className="text-3xl font-bold my-8 text-green-700">
+          🥗 AI-Suggested Diet Plans
+        </h2>
+        {loading ? <p>Loading diets...</p> : renderCards("diet")}
       </div>
     </div>
   );
 };
 
-export default Task;
+export default EnhancedSuggestions;

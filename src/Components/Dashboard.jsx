@@ -13,7 +13,7 @@ import TodaysFocus from "./TodayFocus";
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 const openai = new OpenAI({
-  apiKey: API_KEY, // Ensure this is set in your .env file
+  apiKey: API_KEY,
   dangerouslyAllowBrowser: true,
 });
 
@@ -36,7 +36,7 @@ const Dashboard = () => {
       .from("workout_logs")
       .select("*")
       .eq("user_id", user.id)
-      .order("workout_date", { ascending: true }); // ✅ Use `workout_date`
+      .order("workout_date", { ascending: true });
 
     if (error) {
       console.error("Error fetching workout logs:", error.message);
@@ -49,7 +49,6 @@ const Dashboard = () => {
     fetchWorkoutLogs();
   }, [user]);
 
-  // ✅ Log or Update a Workout
   const logWorkout = async (status) => {
     if (!user) return;
     const today = new Date().toISOString().split("T")[0];
@@ -91,10 +90,9 @@ const Dashboard = () => {
       }
     }
 
-    fetchWorkoutLogs(); // ✅ Refresh the graph after updating logs
+    fetchWorkoutLogs();
   };
 
-  // ✅ Delete a Workout
   const deleteWorkout = async (id) => {
     const { error } = await supabase.from("workout_logs").delete().eq("id", id);
     if (error) {
@@ -103,7 +101,7 @@ const Dashboard = () => {
       fetchWorkoutLogs();
     }
   };
-  // ✅ Fetch fitness assessment for AI Diet Plan
+
   useEffect(() => {
     fetchAssessment();
     fetchCommunityPosts();
@@ -134,7 +132,6 @@ const Dashboard = () => {
     }
   };
 
-  // ✅ **Generate AI-Powered Diet Plan Using OpenAI**
   const generateDietPlanWithAI = async (data) => {
     if (!data) return;
 
@@ -203,7 +200,6 @@ const Dashboard = () => {
     }
   };
 
-  // ✅ Fix: Add handlePostSubmit Function
   const handlePostSubmit = async () => {
     if (!user) {
       alert("You must be logged in to post!");
@@ -224,8 +220,8 @@ const Dashboard = () => {
       console.error("Error adding post:", error.message);
       alert("Failed to post. Try again!");
     } else {
-      setNewPost(""); // Clear input after posting
-      fetchCommunityPosts(); // Refresh forum posts
+      setNewPost("");
+      fetchCommunityPosts();
     }
 
     setPosting(false);
@@ -235,14 +231,11 @@ const Dashboard = () => {
     <div className="flex lg:flex-row min-h-screen bg-gray-100">
       <Nav />
 
-      {/* Main Content */}
       <div className="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto">
         <h3 className="text-3xl font-bold text-green-600 mb-6 text-center md:text-left">
           📊 Your Fitness Dashboard
         </h3>
 
-        {/* 🏋️ Workout Progress */}
-        {/* 🏋️ Workout Logging Section */}
         <div className="mt-6 bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-4 text-center">
             🏋️ Daily Workout Log
@@ -293,7 +286,6 @@ const Dashboard = () => {
           </ul>
         </div>
 
-        {/* 📈 Workout Tracking Graph */}
         <div className="mt-6 bg-white p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-4 text-center">
             📊 Workout Progress
@@ -307,7 +299,7 @@ const Dashboard = () => {
             <div className="w-full h-64">
               <Line
                 data={{
-                  labels: workoutLogs.map((log) => log.workout_date), // ✅ Use `workout_date`
+                  labels: workoutLogs.map((log) => log.workout_date),
                   datasets: [
                     {
                       label: "Workout Days (1 = Workout, 0 = No Workout)",
@@ -326,7 +318,7 @@ const Dashboard = () => {
                       ticks: {
                         stepSize: 1,
                         min: 0,
-                        max: 1, // ✅ Ensures graph is readable (0 = No, 1 = Yes)
+                        max: 1,
                       },
                     },
                   },
@@ -338,7 +330,6 @@ const Dashboard = () => {
 
         <TodaysFocus />
 
-        {/* 🤖 AI-Generated Diet Plan */}
         <div className="mt-6 bg-white p-6 rounded-lg shadow-lg w-full">
           <h2 className="text-2xl font-semibold text-green-400 mb-4 text-center">
             🤖 AI Coach Diet Plan
