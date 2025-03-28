@@ -9,6 +9,19 @@ import Nav from "./Nav";
 import OpenAI from "openai";
 import { Line } from "react-chartjs-2";
 import TodaysFocus from "./TodayFocus";
+import { LayoutGridIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { ScrollArea } from "./ui/scroll-area";
+import { Skeleton } from "./ui/skeleton";
+import { cn } from "@/lib/utils";
+import FloatingChatbot from "./ui/floating-chatbot";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -209,61 +222,61 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex lg:flex-row min-h-screen bg-gray-100">
-      <Nav />
-      <div className="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto">
-        <h3 className="text-3xl font-bold text-green-600 mb-6 text-center md:text-left">
-          📊 Your Fitness Dashboard
-        </h3>
+    <>
+      <div className="flex relative min-h-screen">
+        <Nav />
+        <ScrollArea className="flex-1 h-screen">
+          <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
+            <div className="flex gap-4 items-center mb-10">
+              <LayoutGridIcon size={40} />
+              <h3>Your Fitness Dashboard</h3>
+            </div>
 
-        {/* Modal if no assessment */}
-        {showAssessmentModal && (
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-xl shadow-xl p-6 max-w-md text-center space-y-4">
-              <h2 className="text-2xl font-bold text-red-500">
-                🚨 No Assessment Found
-              </h2>
-              <p className="text-gray-700">
-                You haven't completed your fitness assessment yet. Would you
-                like to do it now?
-              </p>
-              <div className="flex justify-center gap-4 mt-4">
-                <Button
-                  className="bg-green-600 text-white px-4 py-2 rounded-md"
-                  onClick={() => navigate("/assessment")}
-                >
-                  Go to Assessment
-                </Button>
-                <Button
-                  className="bg-gray-300 px-4 py-2 rounded-md"
-                  onClick={() => setShowAssessmentModal(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
+            <TodaysFocus />
+
+            <div className="p-6 w-full rounded-lg shadow-lg bg-card">
+              <h4 className="mb-5 text-center text-primary">
+                🤖 AI Coach Diet Plan
+              </h4>
+              {dietPlan ? (
+                <pre className="whitespace-pre-wrap">{dietPlan}</pre>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {Array(5)
+                    .fill(0)
+                    .map((_, i) => (
+                      <Skeleton
+                        className="w-full h-5"
+                        key={`diet-plan-skeleton-${i + 1}`}
+                      />
+                    ))}
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </ScrollArea>
 
-        {/* The rest of your dashboard UI remains unchanged */}
-        {/* ... */}
-
-        <TodaysFocus />
-
-        <div className="mt-6 bg-white p-6 rounded-lg shadow-lg w-full">
-          <h2 className="text-2xl font-semibold text-green-400 mb-4 text-center">
-            🤖 AI Coach Diet Plan
-          </h2>
-          {dietPlan ? (
-            <pre className="text-gray-800 whitespace-pre-wrap">{dietPlan}</pre>
-          ) : (
-            <p className="text-gray-500 text-center">
-              ⚠️ Loading generated data, please wait...
-            </p>
-          )}
-        </div>
+        <FloatingChatbot />
       </div>
-    </div>
+
+      {/* Modal if no assessment */}
+      <Dialog open={showAssessmentModal}>
+        <DialogContent canClose={false}>
+          <DialogHeader>
+            <DialogTitle>No Assessment Found</DialogTitle>
+            <DialogDescription>
+              You haven't completed your fitness assessment yet. In order to get
+              a personalized diet plan, please complete your fitness assessment.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => navigate("/assessment")}>
+              Go to Assessment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

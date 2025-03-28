@@ -3,10 +3,20 @@ import { supabase } from "@/supabaseClient";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
-import { Menu, X, BarChart, Dumbbell, LogOut } from "lucide-react";
+import {
+  Menu,
+  X,
+  BarChart,
+  Dumbbell,
+  LogOut,
+  LayoutGridIcon,
+  ChartNoAxesCombinedIcon,
+} from "lucide-react";
 import WorkoutTracker from "./WorkoutTracker";
 import { Link, useNavigate } from "react-router-dom";
 import Nav from "./Nav";
+import { ScrollArea } from "./ui/scroll-area";
+import FloatingChatbot from "./ui/floating-chatbot";
 
 const ChallengeManager = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,17 +50,22 @@ const ChallengeManager = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex md:flex-row h-full overflow-hidden">
+    <div className="flex overflow-hidden h-full">
       {/* Mobile Sidebar Toggle */}
       <Nav />
 
       {/* Content Section */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-6 w-full">
-        <h1 className="text-3xl font-bold text-center mb-6 text-green-400">
-          Track your Journey!
-        </h1>
-        <WorkoutTracker />
-      </div>
+      <ScrollArea className="flex-1 h-screen">
+        <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
+          <div className="flex gap-4 items-center mb-10">
+            <ChartNoAxesCombinedIcon size={40} />
+            <h3>Workout Tracker</h3>
+          </div>
+          <WorkoutTracker />
+
+          <FloatingChatbot />
+        </div>
+      </ScrollArea>
     </div>
   );
 };

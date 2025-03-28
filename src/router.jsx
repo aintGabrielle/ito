@@ -20,7 +20,14 @@ export const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/signin", element: <Signin /> },
   { path: "/signup", element: <Signup /> },
-  { path: "/forum", element: <PrivateRoute><Forum /></PrivateRoute> },
+  {
+    path: "/forum",
+    element: (
+      <PrivateRoute>
+        <Forum />
+      </PrivateRoute>
+    ),
+  },
   {
     path: "/profile",
     element: (
@@ -53,14 +60,14 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-  {
-    path: "/chatbot",
-    element: (
-      <PrivateRoute>
-        <ChatBot />
-      </PrivateRoute>
-    ),
-  },
+  // {
+  //   path: "/chatbot",
+  //   element: (
+  //     <PrivateRoute>
+  //       <ChatBot />
+  //     </PrivateRoute>
+  //   ),
+  // },
   {
     path: "/started-workout",
     element: (

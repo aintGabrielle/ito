@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import Nav from "./Nav";
 import { supabase } from "../supabaseClient";
 import axios from "axios";
+import { Skeleton } from "./ui/skeleton";
+import { ScrollArea } from "./ui/scroll-area";
+import { DumbbellIcon, LayoutGridIcon } from "lucide-react";
 
 const EnhancedSuggestions = () => {
   const [cards, setCards] = useState([]);
@@ -121,33 +124,33 @@ const EnhancedSuggestions = () => {
     const filtered = cards.filter((c) => c.type === type);
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
         {filtered.map((item, i) => (
           <motion.div
-            key={i}
+            key={`card-${i}`}
             layout
             whileTap={{ scale: 0.97 }}
             onClick={() => handleCardClick(item)}
             className="cursor-pointer"
           >
-            <Card className="overflow-hidden shadow-lg rounded-2xl hover:shadow-xl transition-shadow duration-300">
+            <Card className="overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 hover:shadow-xl">
               <img
                 src={getImageURL(item)}
                 alt={item.title}
-                className="w-full h-40 object-cover"
+                className="object-cover w-full h-40"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src =
                     "https://source.unsplash.com/random/800x600/?fitness";
                 }}
               />
-              <CardHeader className="bg-white p-4">
+              <CardHeader className="p-4 bg-white">
                 <CardTitle className="text-xl font-semibold text-gray-800">
                   {item.title}
                 </CardTitle>
               </CardHeader>
               {selectedCard?.title === item.title && (
-                <CardContent className="bg-gray-50 p-4 text-sm text-gray-600">
+                <CardContent className="p-4 text-sm text-gray-600 bg-gray-50">
                   {item.description}
                 </CardContent>
               )}
@@ -159,27 +162,24 @@ const EnhancedSuggestions = () => {
   };
 
   return (
-    <div className="flex h-full bg-green-400 min-h-screen">
+    <div className="flex h-full min-h-screen">
       <Nav />
-      <div className="px-6 py-8 max-w-7xl mx-auto w-full">
-        <h2 className="text-3xl font-bold mb-6 text-green-700">
-          💪 AI-Suggested Workouts
-        </h2>
-        {loading ? (
-          <p className="text-gray-500 text-center">Generating workouts...</p>
-        ) : (
-          renderCards("workout")
-        )}
-
-        <h2 className="text-3xl font-bold my-8 text-green-700">
-          🥗 AI-Suggested Diet Plans
-        </h2>
-        {loading ? (
-          <p className="text-gray-500 text-center">Generating diets...</p>
-        ) : (
-          renderCards("diet")
-        )}
-      </div>
+      <ScrollArea className="flex-1 h-screen">
+        <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
+          <div className="flex gap-4 items-center mb-10">
+            <DumbbellIcon size={40} />
+            <h3>Challenges</h3>
+          </div>
+          <h2>AI-Suggested Workouts</h2>
+          {loading ? (
+            <Skeleton className="w-full h-10" />
+          ) : (
+            renderCards("workout")
+          )}
+          <h2>AI-Suggested Diet Plans</h2>
+          {loading ? <Skeleton className="w-full h-10" /> : renderCards("diet")}
+        </div>
+      </ScrollArea>
     </div>
   );
 };

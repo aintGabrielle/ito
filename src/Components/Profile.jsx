@@ -5,12 +5,14 @@ import { Input } from "./ui/input";
 import { toast } from "sonner";
 import useUser from "../hooks/useUser";
 import Nav from "./Nav";
+import { ScrollArea } from "./ui/scroll-area";
+import { Edit2Icon, UserIcon, SaveIcon } from "lucide-react";
 
 const Profile = () => {
   const { user } = useUser();
   const [assessment, setAssessment] = useState(null);
-  const [editing, setEditing] = useState(null);
   const [updatedValues, setUpdatedValues] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -31,14 +33,9 @@ const Profile = () => {
     if (error) {
       console.error("Supabase Error:", error.message);
     } else {
-      console.log("Fetched Assessment Data:", data);
       setAssessment(data);
       setUpdatedValues(data || {});
     }
-  };
-
-  const handleEdit = (field) => {
-    setEditing(field);
   };
 
   const handleChange = (field, value) => {
@@ -59,136 +56,139 @@ const Profile = () => {
       toast.error("Failed to update fitness assessment.");
     } else {
       toast.success("Fitness assessment updated successfully!");
-      setEditing(null);
-      fetchAssessment(); // Refresh data
+      setIsEditing(false);
+      fetchAssessment();
     }
     setLoading(false);
   };
 
   return (
-    <div className="flex md:flex-row min-h-screen">
-      {/* <div className="absolute z-20 w-full h-full top-0 left-0">
-        <img src="/images/fitness.png" className="w-full h-full" alt="" />
-      </div> */}
+    <div className="flex relative min-h-screen">
       <Nav />
-      <div className="flex flex-col gap-3 items-center justify-center px-4 md:px-6 w-full bg-[url(/images/fitnesss.png)] bg-cover gap-6">
-        <h1 className="text-3xl  font-semibold">
-          Your Fitness Statistics!
-        </h1>
+      <ScrollArea className="flex-1 h-screen">
+        <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
+          {/* Profile Header */}
+          <div className="flex justify-between items-center mb-10">
+            <div className="flex gap-4 items-center">
+              <UserIcon size={40} />
+              <h3 className="text-xl font-semibold">Your Profile</h3>
+            </div>
 
-        {/* Fitness Assessment Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="flex gap-2 items-center">
+              {/* Edit / Save Button */}
+              {!isEditing ? (
+                <Button
+                  onClick={() => {
+                    setIsEditing(true);
+                  }}
+                >
+                  <Edit2Icon className="mr-2" /> Edit
+                </Button>
+              ) : (
+                <Button onClick={handleUpdateFitness} disabled={loading}>
+                  {loading ? (
+                    "Saving..."
+                  ) : (
+                    <>
+                      <SaveIcon className="mr-2" /> Save Changes
+                    </>
+                  )}
+                </Button>
+              )}
+              {/* cancel edit */}
+              {isEditing && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setUpdatedValues(assessment);
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </div>
+
           {assessment ? (
-            <>
-              <EditableStatCard
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <EditableStatRow
                 label="Height"
                 value={updatedValues.height}
                 field="height"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-              <EditableStatCard
+              <EditableStatRow
                 label="Weight"
                 value={updatedValues.currentWeight}
                 field="currentWeight"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-              <EditableStatCard
+              <EditableStatRow
                 label="Goal"
                 value={updatedValues.goal}
                 field="goal"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-              <EditableStatCard
+              <EditableStatRow
                 label="Workout Level"
                 value={updatedValues.workoutLevel}
                 field="workoutLevel"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-              <EditableStatCard
+              <EditableStatRow
                 label="Preferred Muscle Focus"
                 value={updatedValues.focusMuscle}
                 field="focusMuscle"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-              <EditableStatCard
+              <EditableStatRow
                 label="Exercise Type"
                 value={updatedValues.exerciseType}
                 field="exerciseType"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-              <EditableStatCard
+              <EditableStatRow
                 label="Daily Walking"
                 value={updatedValues.dailyWalking}
                 field="dailyWalking"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-              <EditableStatCard
+              <EditableStatRow
                 label="Push-ups Capacity"
                 value={updatedValues.pushups}
                 field="pushups"
-                editing={editing}
-                onEdit={handleEdit}
+                editing={isEditing}
                 onChange={handleChange}
               />
-            </>
+            </div>
           ) : (
-            <p className="text-gray-600">No fitness assessment found.</p>
+            <p className="text-center">No fitness assessment found.</p>
           )}
         </div>
-
-        {/* Save Button */}
-        {editing && (
-          <Button onClick={handleUpdateFitness} className="mt-4">
-            {loading ? "Saving..." : "Save Changes"}
-          </Button>
-        )}
-      </div>
+      </ScrollArea>
     </div>
   );
 };
 
-// Editable Stat Card Component
-const EditableStatCard = ({
-  label,
-  value,
-  field,
-  editing,
-  onEdit,
-  onChange,
-}) => {
+const EditableStatRow = ({ label, value, field, editing, onChange }) => {
   return (
-    <div className="bg-gradient-to-r from-green-400 to-green-600 p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all">
-      <h2 className="text-lg font-semibold text-white">{label}</h2>
-      {editing === field ? (
-        <Input
-          type="text"
-          value={value || ""}
-          onChange={(e) => onChange(field, e.target.value)}
-          className="mt-2 p-2 rounded-md w-full text-white"
-        />
-      ) : (
-        <p className="text-xl font-bold text-white">{value || "N/A"}</p>
-      )}
-      <Button
-        className="mt-2 bg-white text-blue-600 hover:bg-gray-300"
-        onClick={() => onEdit(field)}
-      >
-        Edit
-      </Button>
+    <div className="flex flex-col gap-2">
+      <h5>{label}</h5>
+      <Input
+        type="text"
+        value={value || ""}
+        onChange={(e) => editing && onChange(field, e.target.value)}
+        readOnly={!editing}
+        className={editing ? "border-input" : "border-transparent"}
+      />
     </div>
   );
 };

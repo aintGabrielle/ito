@@ -3,12 +3,14 @@ import { supabase } from "../supabaseClient";
 import useUser from "../hooks/useUser";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Card } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Line } from "react-chartjs-2";
 import "chart.js/auto";
-import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { motion } from "framer-motion";
+import { ScrollArea } from "./ui/scroll-area";
+import { Calendar } from "./ui/calendar";
+import { CalendarFull } from "./ui/calendar-full";
 
 const WorkoutTracker = () => {
   const { user } = useUser();
@@ -104,100 +106,97 @@ const WorkoutTracker = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-start justify-center min-h-screen bg-green-400 p-6 gap-6">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-2xl font-bold text-green-800 mb-4 text-center">
-          📅 Workout Tracker
-        </h2>
-      </motion.div>
+    <div className="flex flex-col gap-4 md:flex-row">
+      {/* Calendar */}
+      <div className="flex-1">
+        <CalendarFull selectedDate={date} onDateSelect={setDate} />
+      </div>
 
-      {/* Left Section: Calendar & Add Workout Form */}
-      <div className="flex flex-col gap-6 w-full md:w-1/3">
-        {/* Calendar */}
-        <Card className="p-4">
-          <Calendar value={date} onChange={setDate} />
-        </Card>
-
+      <div className="flex flex-col flex-1 gap-4">
         {/* Add Workout Form */}
-        <Card className="p-4">
-          <h3 className="text-lg font-bold mb-2">📝 Log Your Workout</h3>
-          <Input
-            value={exercise}
-            onChange={(e) => setExercise(e.target.value)}
-            placeholder="Exercise Name"
-          />
-          <Input
-            type="number"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            placeholder="Duration (minutes)"
-          />
-          <Button
-            onClick={handleAddWorkout}
-            disabled={loading}
-            className="mt-2 w-full"
-          >
-            {loading ? "Saving..." : "Add Workout"}
-          </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>Log Your Workout</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            <Input
+              value={exercise}
+              onChange={(e) => setExercise(e.target.value)}
+              placeholder="Exercise Name"
+            />
+            <Input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              placeholder="Duration (minutes)"
+            />
+            <Button
+              onClick={handleAddWorkout}
+              disabled={loading}
+              className="mt-2 w-full"
+            >
+              {loading ? "Saving..." : "Add Workout"}
+            </Button>
+          </CardContent>
         </Card>
-      </div>
 
-      {/* Middle Section: Workout List */}
-      <div className="w-full md:w-1/3">
-        <Card className="p-4">
-          <h3 className="text-lg font-bold mb-2">📌 Tracked Workouts</h3>
-          {workouts.length === 0 ? (
-            <p className="text-gray-500">No workouts logged yet.</p>
-          ) : (
-            <ul>
-              {workouts.map((workout) => (
-                <li
-                  key={workout.id}
-                  className="flex justify-between items-center p-2 border-b"
-                >
-                  <div>
-                    <p className="font-semibold">{workout.exercise}</p>
-                    <p className="text-gray-500">{workout.duration} mins</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() =>
-                        handleUpdateWorkout(
-                          workout.id,
-                          prompt("Update Exercise", workout.exercise),
-                          prompt("Update Duration", workout.duration)
-                        )
-                      }
-                    >
-                      ✏️ Edit
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteWorkout(workout.id)}
-                      className="bg-red-500 hover:bg-red-600"
-                    >
-                      ❌ Delete
-                    </Button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+        {/* Middle Section: Workout List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tracked Workouts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {workouts.length === 0 ? (
+              <p className="text-gray-500">No workouts logged yet.</p>
+            ) : (
+              <ul>
+                {workouts.map((workout) => (
+                  <li
+                    key={workout.id}
+                    className="flex justify-between items-center p-2 border-b"
+                  >
+                    <div>
+                      <p className="font-semibold">{workout.exercise}</p>
+                      <p className="text-gray-500">{workout.duration} mins</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() =>
+                          handleUpdateWorkout(
+                            workout.id,
+                            prompt("Update Exercise", workout.exercise),
+                            prompt("Update Duration", workout.duration)
+                          )
+                        }
+                      >
+                        ✏️ Edit
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteWorkout(workout.id)}
+                        className="bg-red-500 hover:bg-red-600"
+                      >
+                        ❌ Delete
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
         </Card>
-      </div>
 
-      {/* Right Section: Workout Graph */}
-      <div className="w-full md:w-1/3">
-        <Card className="p-4">
-          <h3 className="text-lg font-bold mb-2">📊 Progress Chart</h3>
-          {workouts.length > 0 ? (
-            <Line data={workoutGraphData} />
-          ) : (
-            <p className="text-gray-500">No data available.</p>
-          )}
+        {/* Right Section: Workout Graph */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Progress Chart</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {workouts.length > 0 ? (
+              <Line data={workoutGraphData} />
+            ) : (
+              <p className="text-gray-500">No data available.</p>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>

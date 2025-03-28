@@ -3,13 +3,16 @@ import { supabase } from "../supabaseClient";
 import axios from "axios";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Card } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { useAuth } from "@/Context/AuthContext";
 import { ScrollArea } from "./ui/scroll-area";
 import useUser from "../hooks/useUser";
 import { motion } from "framer-motion";
 import Nav from "./Nav";
-import { Loader2 } from "lucide-react";
+import { BotIcon, LayoutGridIcon, Loader2, SendIcon } from "lucide-react";
+import { Textarea } from "./ui/textarea";
+import { cn } from "@/lib/utils";
+import { ChatBubble } from "./ui/chat-bubble";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -80,7 +83,11 @@ const ChatBot = () => {
         {
           model: "gpt-3.5-turbo",
           messages: [
-            { role: "system", content: "You are a helpful AI, but only talks about Fitness and Diets" },
+            {
+              role: "system",
+              content:
+                "You are a helpful AI, but only talks about Fitness and Diets",
+            },
             { role: "user", content: userInput },
           ],
           temperature: 0.7,
@@ -119,7 +126,6 @@ const ChatBot = () => {
     setInput("");
   };
 
-  /** ✅ Auto-scroll to bottom whenever messages update */
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop =
@@ -128,11 +134,10 @@ const ChatBot = () => {
   }, [messages]);
 
   return (
-    <div className="flex  h-screen bg-[url(/images/fitnesss.png)] bg-cover">
+    <div className="flex relative h-screen">
       <Nav />
-      <div className="flex-1 flex flex-col items-center justify-between p-4 w-full max-w-[95%] md:max-w-3xl mx-auto h-full">
+      {/* <div className="flex-1 flex flex-col items-center justify-between p-4 w-full max-w-[95%] md:max-w-3xl mx-auto h-full">
         <Card className="w-full flex-grow rounded-2xl shadow-lg bg-white p-4 flex flex-col overflow-hidden min-h-[75vh]">
-          {/* ✅ Scrollable chat area with auto-scroll */}
           <ScrollArea
             ref={scrollContainerRef}
             className="flex-1 overflow-auto p-2 max-h-[75vh] min-h-[65vh]"
@@ -152,28 +157,82 @@ const ChatBot = () => {
                 {msg.content}
               </motion.div>
             ))}
-            {/* ✅ Invisible anchor to help scroll to bottom */}
             <div ref={messagesEndRef} />
           </ScrollArea>
         </Card>
-        {/* ✅ Input and Send Button always visible */}
-        <div className="flex gap-2 w-full max-w-3xl mt-4 items-center flex-wrap sm:flex-nowrap">
+        <div className="flex flex-wrap gap-2 items-center mt-4 w-full max-w-3xl sm:flex-nowrap">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder="Ask me anything..."
-            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 shadow-sm w-full sm:w-auto"
+            className="flex-1 px-4 py-2 w-full rounded-lg border border-gray-300 shadow-sm sm:w-auto"
           />
           <Button
             onClick={handleSendMessage}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md w-full sm:w-auto"
+            className="px-4 py-2 w-full text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 sm:w-auto"
           >
             {loading ? <Loader2 className="animate-spin" /> : "Send"}
           </Button>
         </div>
-      </div>
+      </div> */}
+
+      <ScrollArea className="w-full">
+        <div className="flex relative flex-col mx-auto w-full max-w-2xl min-h-screen">
+          <div className="flex sticky top-0 gap-4 items-center py-4 bg-background">
+            <BotIcon size={40} />
+            <h3>AI Fitness Coach</h3>
+          </div>
+
+          {/* chat body */}
+          <div className="flex-1 pt-10">
+            {messages.map((msg, index) => (
+              <ChatBubble
+                key={`chat-${index}`}
+                variant={msg.role === "user" ? "outline" : "default"}
+                message={msg.content}
+                role={msg.role}
+                position={msg.role === "user" ? "right" : "left"}
+                showAvatar={false}
+                username={msg.role === "user" ? "You" : "AI Fitness Coach"}
+              />
+            ))}
+          </div>
+
+          {/* chat input */}
+          <div className="flex sticky bottom-0 gap-4 items-center p-2 mb-5 rounded-md border-2">
+            <div className="flex flex-col gap-2 w-full">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                className="border-none shadow-none focus-visible:ring-0"
+                placeholder="Ask me anything..."
+              />
+              <div className="flex justify-end">
+                <Button onClick={handleSendMessage} disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <>
+                      <span>Send</span>
+                      <SendIcon />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+            {/* <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              placeholder="Ask me anything..."
+              className="flex-1 px-4 py-2 w-full rounded-lg border border-gray-300 shadow-sm sm:w-auto"
+            /> */}
+          </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 };
