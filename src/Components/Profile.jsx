@@ -1,65 +1,62 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { toast } from "sonner";
-import useUser from "../hooks/useUser";
 import Nav from "./Nav";
 import { ScrollArea } from "./ui/scroll-area";
 import { Edit2Icon, UserIcon, SaveIcon } from "lucide-react";
+import useProfile from "@/hooks/use-profile";
+import FloatingChatbot from "./ui/floating-chatbot";
+
+const fitnessOptions = {
+  goal: [
+    { value: "lose_weight", label: "Lose Weight" },
+    { value: "maintain_weight", label: "Maintain Weight" },
+    { value: "gain_muscle", label: "Gain Muscle" },
+  ],
+  workoutLevel: [
+    { value: "beginner", label: "Beginner" },
+    { value: "intermediate", label: "Intermediate" },
+    { value: "advanced", label: "Advanced" },
+  ],
+  focusMuscle: [
+    { value: "full_body", label: "Full Body" },
+    { value: "upper_body", label: "Upper Body" },
+    { value: "lower_body", label: "Lower Body" },
+    { value: "core", label: "Core & Abs" },
+  ],
+  exerciseType: [
+    { value: "strength", label: "Strength Training" },
+    { value: "cardio", label: "Cardio" },
+    { value: "yoga", label: "Yoga & Flexibility" },
+    { value: "mixed", label: "Mixed Training" },
+  ],
+};
 
 const Profile = () => {
-  const { user } = useUser();
-  const [assessment, setAssessment] = useState(null);
-  const [updatedValues, setUpdatedValues] = useState({});
+  const { assessment, loading, updateAssessment } = useProfile();
+  const [tempValues, setTempValues] = useState(assessment);
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) fetchAssessment();
-  }, [user]);
-
-  const fetchAssessment = async () => {
-    if (!user) return;
-
-    const { data, error } = await supabase
-      .from("fitness_assessments")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Supabase Error:", error.message);
-    } else {
-      setAssessment(data);
-      setUpdatedValues(data || {});
-    }
-  };
+    if (assessment) setTempValues(assessment);
+  }, [assessment]);
 
   const handleChange = (field, value) => {
-    setUpdatedValues((prev) => ({ ...prev, [field]: value }));
+    setTempValues((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleUpdateFitness = async () => {
-    if (!user) return;
-
-    setLoading(true);
-    const { error } = await supabase
-      .from("fitness_assessments")
-      .update(updatedValues)
-      .eq("user_id", user.id);
-
-    if (error) {
-      console.error("Error updating fitness assessment:", error);
-      toast.error("Failed to update fitness assessment.");
-    } else {
-      toast.success("Fitness assessment updated successfully!");
-      setIsEditing(false);
-      fetchAssessment();
-    }
-    setLoading(false);
+  const handleSave = async () => {
+    await updateAssessment(tempValues);
+    setIsEditing(false);
+    toast.success("Fitness assessment updated successfully!");
   };
 
   return (
@@ -67,7 +64,6 @@ const Profile = () => {
       <Nav />
       <ScrollArea className="flex-1 h-screen">
         <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
-          {/* Profile Header */}
           <div className="flex justify-between items-center mb-10">
             <div className="flex gap-4 items-center">
               <UserIcon size={40} />
@@ -75,17 +71,12 @@ const Profile = () => {
             </div>
 
             <div className="flex gap-2 items-center">
-              {/* Edit / Save Button */}
               {!isEditing ? (
-                <Button
-                  onClick={() => {
-                    setIsEditing(true);
-                  }}
-                >
+                <Button onClick={() => setIsEditing(true)}>
                   <Edit2Icon className="mr-2" /> Edit
                 </Button>
               ) : (
-                <Button onClick={handleUpdateFitness} disabled={loading}>
+                <Button onClick={handleSave} disabled={loading}>
                   {loading ? (
                     "Saving..."
                   ) : (
@@ -95,7 +86,6 @@ const Profile = () => {
                   )}
                 </Button>
               )}
-              {/* cancel edit */}
               {isEditing && (
                 <Button
                   variant="outline"
@@ -114,56 +104,60 @@ const Profile = () => {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <EditableStatRow
                 label="Height"
-                value={updatedValues.height}
+                value={tempValues.height}
                 field="height"
                 editing={isEditing}
                 onChange={handleChange}
               />
               <EditableStatRow
                 label="Weight"
-                value={updatedValues.currentWeight}
+                value={tempValues.currentWeight}
                 field="currentWeight"
                 editing={isEditing}
                 onChange={handleChange}
               />
               <EditableStatRow
                 label="Goal"
-                value={updatedValues.goal}
+                value={tempValues.goal}
                 field="goal"
                 editing={isEditing}
                 onChange={handleChange}
+                options={fitnessOptions.goal}
               />
               <EditableStatRow
                 label="Workout Level"
-                value={updatedValues.workoutLevel}
+                value={tempValues.workoutLevel}
                 field="workoutLevel"
                 editing={isEditing}
                 onChange={handleChange}
+                options={fitnessOptions.workoutLevel}
               />
               <EditableStatRow
                 label="Preferred Muscle Focus"
-                value={updatedValues.focusMuscle}
+                value={tempValues.focusMuscle}
                 field="focusMuscle"
                 editing={isEditing}
                 onChange={handleChange}
+                options={fitnessOptions.focusMuscle}
               />
               <EditableStatRow
                 label="Exercise Type"
-                value={updatedValues.exerciseType}
+                value={tempValues.exerciseType}
                 field="exerciseType"
                 editing={isEditing}
                 onChange={handleChange}
+                options={fitnessOptions.exerciseType}
               />
               <EditableStatRow
                 label="Daily Walking"
-                value={updatedValues.dailyWalking}
+                value={tempValues.dailyWalking}
                 field="dailyWalking"
                 editing={isEditing}
                 onChange={handleChange}
               />
               <EditableStatRow
                 label="Push-ups Capacity"
-                value={updatedValues.pushups}
+                value={tempValues.pushups}
                 field="pushups"
                 editing={isEditing}
                 onChange={handleChange}
@@ -174,21 +168,51 @@ const Profile = () => {
           )}
         </div>
       </ScrollArea>
+
+      <FloatingChatbot />
     </div>
   );
 };
 
-const EditableStatRow = ({ label, value, field, editing, onChange }) => {
+const EditableStatRow = ({
+  label,
+  value,
+  field,
+  editing,
+  onChange,
+  options,
+}) => {
   return (
     <div className="flex flex-col gap-2">
       <h5>{label}</h5>
-      <Input
-        type="text"
-        value={value || ""}
-        onChange={(e) => editing && onChange(field, e.target.value)}
-        readOnly={!editing}
-        className={editing ? "border-input" : "border-transparent"}
-      />
+      {options ? (
+        <Select
+          value={value}
+          onValueChange={(value) => onChange(field, value)}
+          disabled={!editing}
+        >
+          <SelectTrigger
+            className={editing ? "border-input" : "border-transparent"}
+          >
+            <SelectValue placeholder="Select an option" />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <Input
+          type="number"
+          value={value || ""}
+          onChange={(e) => editing && onChange(field, e.target.value)}
+          readOnly={!editing}
+          className={editing ? "border-input" : "border-transparent"}
+        />
+      )}
     </div>
   );
 };

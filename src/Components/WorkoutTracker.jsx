@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import useUser from "../hooks/useUser";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -11,9 +10,10 @@ import { motion } from "framer-motion";
 import { ScrollArea } from "./ui/scroll-area";
 import { Calendar } from "./ui/calendar";
 import { CalendarFull } from "./ui/calendar-full";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const WorkoutTracker = () => {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [date, setDate] = useState(new Date());
   const [exercise, setExercise] = useState("");
   const [duration, setDuration] = useState("");

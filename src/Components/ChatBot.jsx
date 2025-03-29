@@ -6,13 +6,13 @@ import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { useAuth } from "@/Context/AuthContext";
 import { ScrollArea } from "./ui/scroll-area";
-import useUser from "../hooks/useUser";
 import { motion } from "framer-motion";
 import Nav from "./Nav";
 import { BotIcon, LayoutGridIcon, Loader2, SendIcon } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 import { cn } from "@/lib/utils";
 import { ChatBubble } from "./ui/chat-bubble";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -23,34 +23,34 @@ const ChatBot = () => {
     { role: "bot", content: "Hello! How can I assist you today?" },
   ]);
   const [loading, setLoading] = useState(false);
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const messagesEndRef = useRef(null); // ✅ Ref to track the bottom of the chat
   const scrollContainerRef = useRef(null); // ✅ Ref for the scrollable area
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (!user) return;
+  // useEffect(() => {
+  //   const fetchMessages = async () => {
+  //     if (!user) return;
 
-      const { data, error } = await supabase
-        .from("chat_messages")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: true });
+  //     const { data, error } = await supabase
+  //       .from("chat_messages")
+  //       .select("*")
+  //       .eq("user_id", user.id)
+  //       .order("created_at", { ascending: true });
 
-      if (error) {
-        console.error("Error fetching messages:", error);
-      } else if (data && data.length > 0) {
-        setMessages(
-          data.map((msg) => ({
-            role: msg.role,
-            content: msg.message,
-          }))
-        );
-      }
-    };
+  //     if (error) {
+  //       console.error("Error fetching messages:", error);
+  //     } else if (data && data.length > 0) {
+  //       setMessages(
+  //         data.map((msg) => ({
+  //           role: msg.role,
+  //           content: msg.message,
+  //         }))
+  //       );
+  //     }
+  //   };
 
-    fetchMessages();
-  }, [user]);
+  //   fetchMessages();
+  // }, [user]);
 
   const saveMessageToSupabase = async (role, content) => {
     if (!user) {
@@ -100,7 +100,7 @@ const ChatBot = () => {
         }
       );
 
-      const botResponse = res.data.choices[0].message.content;
+      const botResponse = res.data.choices[0].message.message;
       setMessages((prevMessages) => [
         ...prevMessages,
         { role: "bot", content: botResponse },
@@ -154,7 +154,7 @@ const ChatBot = () => {
                     : "bg-gray-200 text-black max-w-[80%]"
                 }`}
               >
-                {msg.content}
+                {msg.message}
               </motion.div>
             ))}
             <div ref={messagesEndRef} />
@@ -191,7 +191,7 @@ const ChatBot = () => {
               <ChatBubble
                 key={`chat-${index}`}
                 variant={msg.role === "user" ? "outline" : "default"}
-                message={msg.content}
+                message={msg.message}
                 role={msg.role}
                 position={msg.role === "user" ? "right" : "left"}
                 showAvatar={false}

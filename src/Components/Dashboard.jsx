@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/Context/AuthContext";
-import useUser from "../hooks/useUser";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { supabase } from "../supabaseClient";
@@ -22,6 +21,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Skeleton } from "./ui/skeleton";
 import { cn } from "@/lib/utils";
 import FloatingChatbot from "./ui/floating-chatbot";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -32,7 +32,7 @@ const openai = new OpenAI({
 
 const Dashboard = () => {
   const { session, signInUser, signOut } = useAuth();
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [assessment, setAssessment] = useState(null);
   const [dietPlan, setDietPlan] = useState(null);
   const [communityPosts, setCommunityPosts] = useState([]);

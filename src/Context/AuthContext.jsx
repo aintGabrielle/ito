@@ -23,7 +23,6 @@ export const AuthContextProvider = ({ children }) => {
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        console.log("Auth state changed:", session);
         setSession(session);
         setUser(session?.user || null);
       }
@@ -45,7 +44,6 @@ export const AuthContextProvider = ({ children }) => {
   // ✅ Sign In with Email/Password
   const signInUser = async (email, password) => {
     try {
-      console.log("Attempting login for:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -61,7 +59,6 @@ export const AuthContextProvider = ({ children }) => {
 
       // ✅ Skip new-user check if OAuth user
       if (session?.provider_token) {
-        console.log("OAuth login detected. Redirecting to dashboard...");
         return { success: true, isNewUser: false };
       }
 
@@ -77,11 +74,9 @@ export const AuthContextProvider = ({ children }) => {
       }
 
       if (!profile) {
-        console.log("New user detected. Redirecting to assessment...");
         return { success: true, isNewUser: true };
       }
 
-      console.log("Existing user detected. Redirecting to dashboard...");
       return { success: true, isNewUser: false };
     } catch (err) {
       console.error("Unexpected error during sign-in:", err);
@@ -97,7 +92,6 @@ export const AuthContextProvider = ({ children }) => {
           ? "http://localhost:5174/auth-redirect"
           : "https://fitmission-zeta.vercel.app/auth-redirect";
 
-      console.log("Google Sign-In Redirecting to:", redirectURL);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectURL },
@@ -126,7 +120,6 @@ export const AuthContextProvider = ({ children }) => {
           ? "http://localhost:5173/auth-redirect"
           : "https://fitmission-zeta.vercel.app/auth-redirect";
 
-      console.log("Google Sign-Up Redirecting to:", redirectURL);
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: redirectURL },
@@ -158,7 +151,6 @@ export const AuthContextProvider = ({ children }) => {
 
       setSession(null);
       setUser(null);
-      console.log("User signed out successfully.");
       return { success: true };
     } catch (err) {
       console.error("Unexpected error during sign-out:", err);
@@ -181,7 +173,7 @@ export const AuthContextProvider = ({ children }) => {
       {!loading ? (
         children
       ) : (
-        <p className="text-center text-lg text-gray-600">Loading...</p>
+        <p className="text-lg text-center text-gray-600">Loading...</p>
       )}
     </AuthContext.Provider>
   );

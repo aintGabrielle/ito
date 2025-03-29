@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/Context/AuthContext";
-import useUser from "../hooks/useUser";
 import { Button, buttonVariants } from "./ui/button";
 import {
   Menu,
@@ -37,10 +36,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const Nav = () => {
   const { session, signInUser, signOut } = useAuth();
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [assessment, setAssessment] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -165,6 +165,7 @@ const Nav = () => {
                 <AlertDialogAction
                   onClick={() => {
                     signOut();
+                    window.localStorage.removeItem("app-cache");
                     navigate("/");
                   }}
                   className={cn(

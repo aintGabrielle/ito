@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import useUser from "../hooks/useUser";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const UserStatistics = () => {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [statistics, setStatistics] = useState([]);
 
   useEffect(() => {
@@ -23,16 +23,16 @@ const UserStatistics = () => {
   }, [user]);
 
   return (
-    <div className="max-w-5xl mx-auto ">
+    <div className="mx-auto max-w-5xl">
       {statistics.map((item) => (
-        <div key={item.id} className="flex items-center gap-3">
-          <h1 className="py-5 px-3 text-2xl shadow-lg rounded-lg bg-green-400 text-white flex-1">
+        <div key={item.id} className="flex gap-3 items-center">
+          <h1 className="flex-1 px-3 py-5 text-2xl text-white bg-green-400 rounded-lg shadow-lg">
             WEIGHT: <span>{item.weight}kg</span>
           </h1>
-          <h1 className="py-5 px-3 text-2xl shadow-lg rounded-lg bg-green-400 text-white flex-1">
+          <h1 className="flex-1 px-3 py-5 text-2xl text-white bg-green-400 rounded-lg shadow-lg">
             HEIGHT: <span>{item.height}cm</span>
           </h1>
-          <h1 className="py-5 px-3 text-2xl shadow-lg rounded-lg bg-green-400 text-white flex-1">
+          <h1 className="flex-1 px-3 py-5 text-2xl text-white bg-green-400 rounded-lg shadow-lg">
             PROTEIN INTAKE: <span>{item.protein_intake} g</span>
           </h1>
         </div>

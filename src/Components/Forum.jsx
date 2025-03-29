@@ -1,19 +1,19 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/Context/AuthContext";
-import useUser from "../hooks/useUser";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Nav from "./Nav";
 import { ScrollArea } from "./ui/scroll-area";
 import { ScrollIcon } from "lucide-react";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const Forum = () => {
   const { session, signInUser, signOut } = useAuth();
   const [communityPosts, setCommunityPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
   const [posting, setPosting] = useState(false);
-  const { user } = useUser();
+  const { user } = useCurrentUser();
 
   const fetchCommunityPosts = async () => {
     const { data, error } = await supabase
