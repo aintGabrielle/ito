@@ -1,20 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
 
 const LandingNav = () => {
   return (
-    <nav className="flex justify-around items-center px-3 py-2 w-full top-0 left-0 sticky bg-white">
-      <div className="flex items-center gap-2">
-        <img src="/images/logo.png" className="w-16" alt="" />
-        <h3 className="font-bold text-xl text-green-400 italic">FitMission</h3>
-      </div>
-      <div>
-        <Link
-          to={"/signin"}
-          className="text-white bg-green-400 font-semibold px-3 py-2 rounded-lg"
-        >
-          GET STARTED
-        </Link>
+    <nav className="flex fixed top-0 z-40 justify-center px-3 py-3 w-full bg-background">
+      <div className="flex justify-between items-center w-full max-w-7xl">
+        <div className="flex gap-2 items-center">
+          <img src="/images/logo.png" className="w-12" alt="" />
+          <h5>FitMission</h5>
+        </div>
+        <div className="flex gap-3 items-center">
+          <Link to="/signin">
+            <Button size="sm">GET STARTED</Button>
+          </Link>
+        </div>
       </div>
     </nav>
   );

@@ -1,6 +1,9 @@
 // components/dashboard/TodaysFocus.jsx
 import React, { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
+import { Skeleton } from "./ui/skeleton";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 const TodaysFocus = () => {
   const [focus, setFocus] = useState("");
@@ -91,26 +94,20 @@ const TodaysFocus = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4">
-      <h2 className="font-semibold text-lg mb-2">Today's Focus</h2>
+    <div className="p-4 bg-white rounded-lg shadow-md">
+      <h2 className="mb-2 text-lg font-semibold">Today's Focus</h2>
       {loading ? (
-        <p className="text-gray-700">Loading...</p>
+        <Skeleton className="w-full h-10" />
       ) : (
-        <div className="flex items-center">
-          <input
+        <div className="flex gap-2 items-center">
+          <Input
             type="text"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mr-2"
             placeholder="What's your focus for today?"
             value={focus}
             onChange={handleFocusChange}
           />
-          
-          <button
-            onClick={saveTodaysFocus}
-            className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Save
-          </button>
+
+          <Button onClick={saveTodaysFocus}>Save</Button>
         </div>
       )}
     </div>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
-import useUser from "../hooks/useUser";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const UpdateStatistics = () => {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [statistics, setStatistics] = useState(null);
   const [formData, setFormData] = useState({});
 

@@ -8,10 +8,10 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { supabase } from "../supabaseClient";
-import useUser from "../hooks/useUser";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const StepCounterWithMap = () => {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [steps, setSteps] = useState(0);
   const [distance, setDistance] = useState(0);
   const [position, setPosition] = useState(null);
@@ -99,7 +99,7 @@ const StepCounterWithMap = () => {
   };
 
   return (
-    <div className="p-4 bg-white shadow-md rounded-lg text-center z-10">
+    <div className="z-10 p-4 text-center bg-white rounded-lg shadow-md">
       <h2 className="text-xl font-bold text-green-600">Step Counter & Map</h2>
 
       <div className="my-4">
@@ -126,7 +126,7 @@ const StepCounterWithMap = () => {
 
       <button
         onClick={saveData}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600"
       >
         Save Progress
       </button>

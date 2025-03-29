@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import LandingNav from "./LandingNav";
+import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -88,95 +92,89 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
-        <div className="text-center">
-          <img
-            src="/images/logo.png"
-            className="w-16 mx-auto mb-2"
-            alt="Logo"
-          />
-          <h1 className="text-2xl font-bold text-green-500">FitMission</h1>
-          <p className="text-gray-600">Create your account</p>
+    <>
+      <LandingNav />
+      <div className="flex justify-center items-center px-3 min-h-screen bg-background">
+        <div className="p-5 w-full max-w-md rounded-lg border-2 shadow-lg border-border">
+          <div className="text-center">
+            <img
+              src="/images/logo.png"
+              className="mx-auto mb-2 w-16"
+              alt="Logo"
+            />
+            <h3 className="text-primary">FitMission</h3>
+            <p>Create your account</p>
+          </div>
+
+          <form onSubmit={handleSignUp} className="flex flex-col gap-2 mt-2">
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <div>
+              <Label>Password</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <div className="mb-5">
+              <Label>Confirm Password</Label>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                required
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full"
+              size="lg"
+            >
+              {loading ? "Signing up..." : "Sign Up"}
+            </Button>
+
+            <Button
+              type="button"
+              onClick={handleGoogleSignUp}
+              className="w-full"
+              variant="outline"
+              size="lg"
+            >
+              <FcGoogle className="text-2xl" /> Sign up with Google
+            </Button>
+
+            {error && (
+              <p className="mt-2 text-sm text-center text-red-500">{error}</p>
+            )}
+
+            <div className="mt-5 text-center">
+              <p>
+                Already have an account?{" "}
+                <Link className="font-semibold text-primary" to="/signin">
+                  Sign-in
+                </Link>
+              </p>
+            </div>
+          </form>
         </div>
-
-        <form onSubmit={handleSignUp} className="mt-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-green-400 focus:border-green-400"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-green-400 focus:border-green-400"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your password"
-              className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-green-400 focus:border-green-400"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-500 text-white py-2 rounded-lg text-lg font-semibold hover:bg-green-600 transition-all"
-          >
-            {loading ? "Signing up..." : "Sign Up"}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleGoogleSignUp}
-            className="w-full flex items-center justify-center gap-2 bg-white border py-2 rounded-lg text-lg font-semibold shadow-md hover:bg-gray-100 transition-all"
-          >
-            <FcGoogle className="text-2xl" /> Sign up with Google
-          </button>
-
-          {error && (
-            <p className="text-red-500 text-sm text-center mt-2">{error}</p>
-          )}
-
-          <div className="text-center mt-3">
-            <p className="text-gray-600">
-              Already have an account?{" "}
-              <Link className="text-green-500 font-semibold" to="/signin">
-                Sign-in
-              </Link>
-            </p>
-            <Link className="text-gray-500 text-sm mt-2 block" to="/">
-              Back to home
-            </Link>
-          </div>
-        </form>
       </div>
-    </div>
+    </>
   );
 };
 

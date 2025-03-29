@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import useUser from "../hooks/useUser";
 import axios from "axios";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 const DietPlanCard = () => {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [dietPlan, setDietPlan] = useState(null);
   const [workoutPlan, setWorkoutPlan] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -110,17 +110,17 @@ const DietPlanCard = () => {
   }
 
   return (
-    <div className="w-full flex-grow bg-white rounded-2xl shadow-lg p-4 flex flex-col overflow-hidden border border-gray-300">
+    <div className="flex overflow-hidden flex-col flex-grow p-4 w-full bg-white rounded-2xl border border-gray-300 shadow-lg">
       {/* Diet Plan Section */}
       <h2 className="text-lg font-bold text-green-800">
         🍽️ Suggested Diet Plan
       </h2>
       {dietPlan ? (
-        <ul className="list-disc pl-5 text-gray-700">
+        <ul className="pl-5 list-disc text-gray-700">
           {Object.entries(dietPlan).map(([meal, items]) => (
             <li key={meal} className="mb-1">
               <strong>{meal}:</strong>
-              <ul className="list-disc pl-5">
+              <ul className="pl-5 list-disc">
                 {items.map((item, index) => (
                   <li key={index} className="text-sm">
                     ✅ {item}
@@ -135,15 +135,15 @@ const DietPlanCard = () => {
       )}
 
       {/* Workout Plan Section */}
-      <h2 className="text-lg font-bold text-blue-800 mt-6">
+      <h2 className="mt-6 text-lg font-bold text-blue-800">
         🏋️ Suggested Workout Plan
       </h2>
       {workoutPlan ? (
-        <ul className="list-disc pl-5 text-gray-700">
+        <ul className="pl-5 list-disc text-gray-700">
           {Object.entries(workoutPlan).map(([section, exercises]) => (
             <li key={section} className="mb-1">
               <strong>{section}:</strong>
-              <ul className="list-disc pl-5">
+              <ul className="pl-5 list-disc">
                 {exercises.map((exercise, index) => (
                   <li key={index} className="text-sm">
                     💪 {exercise}
