@@ -19,6 +19,7 @@ import {
   ListIcon,
   ScrollIcon,
   UserIcon,
+  BicepsFlexedIcon,
 } from "lucide-react"; // Sidebar Icons
 import { supabase } from "../supabaseClient";
 import StartedWorkout from "./StartedWorkout";
@@ -105,7 +106,7 @@ const Nav = () => {
           </div>
         </div>
 
-        <nav className="flex flex-col flex-grow space-y-4">
+        <nav className="flex flex-col flex-grow gap-2">
           <Link to="/dashboard">
             <Button variant="ghost" className="justify-start w-full">
               <LayoutGridIcon size={20} />
@@ -130,18 +131,24 @@ const Nav = () => {
               Challenge
             </Button>
           </Link>
+          <Link to="/fitness">
+            <Button variant="ghost" className="justify-start w-full">
+              <BicepsFlexedIcon size={20} />
+              Fitness & Diet
+            </Button>
+          </Link>
           <Link to="/profile">
             <Button variant="ghost" className="justify-start w-full">
               <UserIcon size={20} />
               Profile
             </Button>
           </Link>
-          <Link to="/forum">
+          {/* <Link to="/forum">
             <Button variant="ghost" className="justify-start w-full">
               <ScrollIcon size={20} />
               Forum
             </Button>
-          </Link>
+          </Link> */}
         </nav>
 
         <div className="mt-auto">

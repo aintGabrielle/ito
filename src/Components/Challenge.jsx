@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
+import { Button, buttonVariants } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
@@ -8,6 +8,7 @@ import {
   Edit2Icon,
   EditIcon,
   PenIcon,
+  PlusCircleIcon,
   TrashIcon,
 } from "lucide-react";
 import { Line } from "react-chartjs-2";
@@ -17,24 +18,131 @@ import { CalendarFull } from "./ui/calendar-full";
 import FloatingChatbot from "./ui/floating-chatbot";
 import Nav from "./Nav";
 import useWorkouts from "@/hooks/use-workouts";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Label } from "./ui/label";
+import { date } from "zod";
+import AddActivityModal from "./pages/challenge/add-activity-modal";
+
+const ActivityCard = ({ workout }) => {
+  const { deleteWorkout, updateWorkout } = useWorkouts();
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  return (
+    <li
+      key={workout?.id || Math.random()}
+      className="flex justify-between items-center p-2 border-b"
+    >
+      <div>
+        <p className="font-semibold">
+          {workout?.exercise || "Unknown Exercise"}
+        </p>
+        <p className="text-gray-500">{workout?.duration || 0} mins</p>
+      </div>
+      <div className="flex gap-2">
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogTrigger asChild>
+            <Button size="icon" variant="outline">
+              <Edit2Icon />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Activity</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const data = Object.fromEntries(formData);
+
+                toast.promise(updateWorkout?.(workout.id, data), {
+                  loading: "Updating activity",
+                  success: () => {
+                    setIsEditOpen(false);
+                    return "Activity updated successfully";
+                  },
+                  error: "Failed to update activity",
+                });
+              }}
+              className="flex flex-col gap-4 mt-5"
+            >
+              <Label className="flex flex-col gap-2">
+                <span>Activity Name</span>
+                <Input name="exercise" defaultValue={workout?.exercise} />
+              </Label>
+              <Label className="flex flex-col gap-2">
+                <span>Duration (in minutes)</span>
+                <Input
+                  type="number"
+                  name="duration"
+                  defaultValue={workout?.duration}
+                  className="w-full"
+                />
+              </Label>
+              <Button type="submit">Confirm Edit</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="icon" variant="destructive">
+              <TrashIcon />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Do you want to remove this activity?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This action is irreversible. Please proceed with caution.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className={cn(buttonVariants({ variant: "destructive" }))}
+                onClick={() => {
+                  toast.promise(deleteWorkout?.(workout.id), {
+                    loading: "Removing activity",
+                    success: "Activity removed successfully",
+                    error: "Failed to remove activity",
+                  });
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </li>
+  );
+};
 
 const ChallengeManager = () => {
-  const {
-    workouts = [],
-    addWorkout,
-    updateWorkout,
-    deleteWorkout,
-  } = useWorkouts() || {};
+  const { workouts } = useWorkouts() || {};
   const [date, setDate] = useState(new Date());
-  const [exercise, setExercise] = useState("");
-  const [duration, setDuration] = useState("");
-
-  const handleAddWorkout = () => {
-    if (!exercise || !duration) return alert("Fill all fields!");
-    addWorkout?.({ date, exercise, duration: parseInt(duration) });
-    setExercise("");
-    setDuration("");
-  };
 
   const workoutGraphData = {
     labels: workouts.map((workout) => workout?.date || "Unknown Date"),
@@ -54,16 +162,16 @@ const ChallengeManager = () => {
       <Nav />
       <ScrollArea className="flex-1 h-screen">
         <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
-          <div className="flex gap-4 items-center mb-10">
+          <div className="flex flex-1 gap-4 items-center mb-10">
             <ChartNoAxesCombinedIcon size={40} />
             <h3>Workout Tracker</h3>
           </div>
-          <div className="flex flex-col gap-4 md:flex-row">
+          <div className="flex flex-col flex-1 gap-4 lg:flex-row">
             <div className="flex-1">
               <CalendarFull selectedDate={date} onDateSelect={setDate} />
             </div>
             <div className="flex flex-col flex-1 gap-4">
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   <CardTitle>Log Your Workout</CardTitle>
                 </CardHeader>
@@ -85,10 +193,11 @@ const ChallengeManager = () => {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row justify-between items-center">
                   <CardTitle>Tracked Workouts</CardTitle>
+                  <AddActivityModal />
                 </CardHeader>
                 <CardContent>
                   {workouts.length === 0 ? (
@@ -96,47 +205,10 @@ const ChallengeManager = () => {
                   ) : (
                     <ul>
                       {workouts.map((workout) => (
-                        <li
+                        <ActivityCard
                           key={workout?.id || Math.random()}
-                          className="flex justify-between items-center p-2 border-b"
-                        >
-                          <div>
-                            <p className="font-semibold">
-                              {workout?.exercise || "Unknown Exercise"}
-                            </p>
-                            <p className="text-gray-500">
-                              {workout?.duration || 0} mins
-                            </p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() =>
-                                updateWorkout?.(workout.id, {
-                                  exercise:
-                                    prompt(
-                                      "Update Exercise",
-                                      workout?.exercise
-                                    ) || workout?.exercise,
-                                  duration:
-                                    prompt(
-                                      "Update Duration",
-                                      workout?.duration
-                                    ) || workout?.duration,
-                                })
-                              }
-                            >
-                              <Edit2Icon />
-                              Edit
-                            </Button>
-                            <Button
-                              onClick={() => deleteWorkout?.(workout.id)}
-                              variant="destructive"
-                            >
-                              <TrashIcon />
-                              Delete
-                            </Button>
-                          </div>
-                        </li>
+                          workout={workout}
+                        />
                       ))}
                     </ul>
                   )}

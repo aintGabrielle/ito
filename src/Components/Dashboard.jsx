@@ -8,7 +8,7 @@ import Nav from "./Nav";
 import OpenAI from "openai";
 import { Line } from "react-chartjs-2";
 import TodaysFocus from "./TodayFocus";
-import { LayoutGridIcon } from "lucide-react";
+import { ClockIcon, LayoutGridIcon, ScaleIcon, TargetIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,9 @@ const Dashboard = () => {
   const [posting, setPosting] = useState(false);
   const [workoutLogs, setWorkoutLogs] = useState([]);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [targetWeight, setTargetWeight] = useState(null);
+  const [estimatedTime, setEstimatedTime] = useState(null);
 
   const navigate = useNavigate();
 
@@ -105,19 +108,26 @@ const Dashboard = () => {
     fetchWorkoutLogs();
   };
 
-  const deleteWorkout = async (id) => {
-    const { error } = await supabase.from("workout_logs").delete().eq("id", id);
-    if (error) {
-      console.error("Error deleting workout log:", error.message);
-    } else {
-      fetchWorkoutLogs();
+  const fetchAISuggestions = async () => {
+    if (!user) return;
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: "Provide 3 fitness and diet suggestions for users.",
+          },
+        ],
+        max_tokens: 150,
+        temperature: 0.7,
+      });
+      setAiSuggestions(response.choices[0]?.message?.content.split("\n") || []);
+    } catch (error) {
+      console.error("Error fetching AI suggestions:", error);
     }
   };
-
-  useEffect(() => {
-    fetchAssessment();
-    fetchCommunityPosts();
-  }, [user]);
 
   const fetchAssessment = async () => {
     if (!user) {
@@ -136,130 +146,69 @@ const Dashboard = () => {
     if (error) {
       console.error("Supabase Error:", error.message);
     } else {
-      console.log("Fetched Assessment Data:", data);
+      setAssessment(data);
       if (data) {
-        setAssessment(data);
-        generateDietPlanWithAI(data);
+        setTargetWeight((data.currentWeight - 5).toFixed(1));
+        setEstimatedTime("~8 weeks");
       } else {
         setShowAssessmentModal(true);
       }
     }
   };
 
-  const generateDietPlanWithAI = async (data) => {
-    if (!data) return;
-
-    const {
-      weight,
-      height,
-      goal,
-      workoutLevel,
-      exerciseType,
-      dailyWalking,
-      pushups,
-    } = data;
-    const bmi = (weight / (height / 100) ** 2).toFixed(1);
-
-    const prompt = `You are a professional dietitian. Generate a personalized diet plan for a user based on their fitness data:\n- Weight: ${weight} kg\n- Height: ${height} cm\n- BMI: ${bmi}\n- Goal: ${goal}\n- Workout Level: ${workoutLevel}\n- Exercise Type: ${exerciseType}\n- Daily Walking: ${dailyWalking} minutes\n- Push-ups: ${pushups} reps\n\nProvide a structured meal plan including:\n- Breakfast\n- Lunch\n- Dinner\n- Snacks\n- Additional recommendations`;
-
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [{ role: "system", content: prompt }],
-        max_tokens: 300,
-        temperature: 0.7,
-      });
-
-      setDietPlan(
-        response.choices[0]?.message?.content || "No response from AI."
-      );
-    } catch (error) {
-      console.error("Error generating diet plan:", error);
-      setDietPlan(
-        `⚠️ Failed to generate AI meal plan. OpenAI Error: ${error.message}`
-      );
-    }
-  };
-
-  const fetchCommunityPosts = async () => {
-    const { data, error } = await supabase
-      .from("community_posts")
-      .select("id, user_id, content, created_at")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching community posts:", error.message);
-    } else {
-      setCommunityPosts(data);
-    }
-  };
-
-  const handlePostSubmit = async () => {
-    if (!user) {
-      alert("You must be logged in to post!");
-      return;
-    }
-    if (!newPost.trim()) {
-      alert("Post cannot be empty!");
-      return;
-    }
-
-    setPosting(true);
-
-    const { error } = await supabase
-      .from("community_posts")
-      .insert([{ user_id: user.id, content: newPost }]);
-
-    if (error) {
-      console.error("Error adding post:", error.message);
-      alert("Failed to post. Try again!");
-    } else {
-      setNewPost("");
-      fetchCommunityPosts();
-    }
-
-    setPosting(false);
-  };
+  useEffect(() => {
+    fetchAssessment();
+    fetchAISuggestions();
+  }, [user]);
 
   return (
     <>
       <div className="flex relative min-h-screen">
         <Nav />
-        <ScrollArea className="flex-1 h-screen">
-          <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
-            <div className="flex gap-4 items-center mb-10">
+        <ScrollArea className="flex-1 p-6 h-screen">
+          <div className="space-y-6">
+            <div className="flex gap-4 items-center">
               <LayoutGridIcon size={40} />
               <h3>Your Fitness Dashboard</h3>
             </div>
-
             <TodaysFocus />
-
-            <div className="p-6 w-full rounded-lg shadow-lg bg-card">
-              <h4 className="mb-5 text-center text-primary">
-                🤖 AI Coach Diet Plan
-              </h4>
-              {dietPlan ? (
-                <pre className="whitespace-pre-wrap">{dietPlan}</pre>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {Array(5)
-                    .fill(0)
-                    .map((_, i) => (
-                      <Skeleton
-                        className="w-full h-5"
-                        key={`diet-plan-skeleton-${i + 1}`}
-                      />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="p-6 rounded-lg shadow-lg bg-card">
+                <h4 className="mb-5 text-center text-primary">
+                  AI Coach Suggestions
+                </h4>
+                {aiSuggestions.length > 0 ? (
+                  <ul className="list-disc list-inside">
+                    {aiSuggestions.map((suggestion, index) => (
+                      <li key={index}>{suggestion}</li>
                     ))}
+                  </ul>
+                ) : (
+                  <Skeleton className="w-full h-5" />
+                )}
+              </div>
+              <div className="flex flex-col items-center p-6 rounded-lg shadow-lg bg-card">
+                <h4 className="mb-5 text-primary">Target Weight & Progress</h4>
+                <div className="flex gap-4 items-center">
+                  <p className="flex items-center">
+                    <TargetIcon size={20} className="mr-2" />
+                    Weight Goal:
+                  </p>
+                  <p className="font-semibold">{targetWeight} kg</p>
                 </div>
-              )}
+                <div className="flex gap-4 items-center">
+                  <p className="flex items-center">
+                    <ClockIcon size={20} className="mr-2" />
+                    Estimated Time:
+                  </p>
+                  <p className="font-semibold">{estimatedTime}</p>
+                </div>
+              </div>
             </div>
           </div>
         </ScrollArea>
-
         <FloatingChatbot />
       </div>
-
-      {/* Modal if no assessment */}
       <Dialog open={showAssessmentModal}>
         <DialogContent canClose={false}>
           <DialogHeader>
