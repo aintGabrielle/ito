@@ -1,11 +1,10 @@
-import {
-  BicepsFlexedIcon,
-  ExternalLinkIcon,
-  PlusCircleIcon,
-  TrendingUpIcon,
-} from "lucide-react";
+import useProfile from "@/hooks/use-profile";
+import useWorkouts from "@/hooks/use-workouts";
+import * as datefn from "date-fns";
+import { BicepsFlexedIcon, Clock4Icon, PlusCircleIcon } from "lucide-react";
 import Nav from "./Nav";
-import { ScrollArea } from "./ui/scroll-area";
+import AddActivityModal from "./pages/challenge/add-activity-modal";
+import { Button } from "./ui/button";
 import {
   Card,
   CardContent,
@@ -14,31 +13,22 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { ChartContainer } from "./ui/chart";
-import {
-  Label,
-  PolarGrid,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-} from "recharts";
-import { Link } from "react-router-dom";
-import { Button } from "./ui/button";
-import AddActivityModal from "./pages/challenge/add-activity-modal";
+import CircleProgress from "./ui/circle-progress";
+import { ScrollArea } from "./ui/scroll-area";
 
 const Fitness = () => {
-  const chartData = [
-    { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  ];
-  const chartConfig = {
-    visitors: {
-      label: "Visitors",
-    },
-    safari: {
-      label: "Safari",
-      color: "hsl(var(--chart-2))",
-    },
-  };
+  const { assessment } = useProfile();
+  const { workouts } = useWorkouts();
+
+  const totalCalories = workouts.reduce(
+    (acc, workout) => acc + workout.calories_burned,
+    0
+  );
+  const totalDuration = workouts.reduce(
+    (acc, workout) => acc + workout.duration,
+    0
+  );
+  const totalWorkouts = workouts.length;
 
   return (
     <div className="flex relative min-h-screen">
@@ -65,160 +55,126 @@ const Fitness = () => {
               <Card className="flex flex-col flex-1">
                 <CardHeader className="items-center pb-0">
                   <CardTitle>Calorie Burned</CardTitle>
-                  <CardDescription>January - June 2024</CardDescription>
+                  <CardDescription>
+                    {datefn.format(
+                      String(assessment.calorie_goal_duration).split("|")[0],
+                      "MMMM dd, yyyy"
+                    )}{" "}
+                    to{" "}
+                    {datefn.format(
+                      String(assessment.calorie_goal_duration).split("|")[1],
+                      "MMMM dd, yyyy"
+                    )}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 pb-0">
-                  <ChartContainer
-                    config={chartConfig}
-                    className="mx-auto aspect-square max-h-[250px]"
-                  >
-                    <RadialBarChart
-                      data={chartData}
-                      startAngle={0}
-                      endAngle={250}
-                      innerRadius={80}
-                      outerRadius={110}
-                    >
-                      <PolarGrid
-                        gridType="circle"
-                        radialLines={false}
-                        stroke="none"
-                        className="first:fill-muted last:fill-background"
-                        polarRadius={[86, 74]}
-                      />
-                      <RadialBar
-                        dataKey="visitors"
-                        background
-                        cornerRadius={10}
-                      />
-                      <PolarRadiusAxis
-                        tick={false}
-                        tickLine={false}
-                        axisLine={false}
-                      >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                  dominantBaseline="middle"
-                                >
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={viewBox.cy}
-                                    className="text-4xl font-bold fill-foreground"
-                                  >
-                                    {chartData[0].visitors.toLocaleString()}
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
-                                  >
-                                    kcal
-                                  </tspan>
-                                </text>
-                              );
-                            }
-                          }}
-                        />
-                      </PolarRadiusAxis>
-                    </RadialBarChart>
-                  </ChartContainer>
+                  <div className="flex justify-center">
+                    <CircleProgress
+                      value={
+                        (totalCalories / assessment?.calorie_goal_count) * 100
+                      }
+                      size={200}
+                      showLabel={true}
+                      renderLabel={(e) => {
+                        return (
+                          <span className="flex flex-col items-center leading-none">
+                            <span className="text-3xl font-bold">
+                              {totalCalories}
+                            </span>
+                            <span className="opacity-50">kcal</span>
+                          </span>
+                        );
+                      }}
+                    />
+                  </div>
                 </CardContent>
                 <CardFooter className="flex-col gap-2 text-sm">
                   <div className="flex gap-2 items-center font-medium leading-none">
-                    5% of 1000 kcal
+                    {(
+                      (totalCalories / assessment?.calorie_goal_count) *
+                      100
+                    ).toFixed(2)}
+                    % of {assessment?.calorie_goal_count} kcal
                   </div>
                   <div className="leading-none text-muted-foreground">
-                    Showing total calories burned for this month
+                    Showing total calories burned
                   </div>
                 </CardFooter>
               </Card>
               <Card className="flex flex-col flex-1">
                 <CardHeader className="items-center pb-0">
                   <CardTitle>Workout Monitor</CardTitle>
-                  <CardDescription>January - June 2024</CardDescription>
+                  <CardDescription>
+                    {datefn.format(
+                      String(assessment.activity_goal_duration).split("|")[0],
+                      "MMMM dd, yyyy"
+                    )}{" "}
+                    to{" "}
+                    {datefn.format(
+                      String(assessment.activity_goal_duration).split("|")[1],
+                      "MMMM dd, yyyy"
+                    )}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 pb-0">
-                  <ChartContainer
-                    config={chartConfig}
-                    className="mx-auto aspect-square max-h-[250px]"
-                  >
-                    <RadialBarChart
-                      data={chartData}
-                      startAngle={0}
-                      endAngle={250}
-                      innerRadius={80}
-                      outerRadius={110}
-                    >
-                      <PolarGrid
-                        gridType="circle"
-                        radialLines={false}
-                        stroke="none"
-                        className="first:fill-muted last:fill-background"
-                        polarRadius={[86, 74]}
-                      />
-                      <RadialBar
-                        dataKey="visitors"
-                        background
-                        cornerRadius={10}
-                      />
-                      <PolarRadiusAxis
-                        tick={false}
-                        tickLine={false}
-                        axisLine={false}
-                      >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                  dominantBaseline="middle"
-                                >
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={viewBox.cy}
-                                    className="text-4xl font-bold fill-foreground"
-                                  >
-                                    {chartData[0].visitors.toLocaleString()}
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
-                                  >
-                                    Activities
-                                  </tspan>
-                                </text>
-                              );
-                            }
-                          }}
-                        />
-                      </PolarRadiusAxis>
-                    </RadialBarChart>
-                  </ChartContainer>
+                  <div className="flex justify-center">
+                    <CircleProgress
+                      value={
+                        (totalWorkouts / assessment?.activity_goal_count) * 100
+                      }
+                      size={200}
+                      showLabel={true}
+                      renderLabel={(e) => {
+                        return (
+                          <span className="flex flex-col items-center leading-none">
+                            <span className="text-3xl font-bold">
+                              {totalWorkouts}
+                            </span>
+                            <span className="opacity-50">activities</span>
+                          </span>
+                        );
+                      }}
+                    />
+                  </div>
                 </CardContent>
                 <CardFooter className="flex-col gap-2 text-sm">
                   <div className="flex gap-2 items-center font-medium leading-none">
-                    1% of 100 activities
+                    {(
+                      (totalWorkouts / assessment?.activity_goal_count) *
+                      100
+                    ).toFixed(2)}
+                    % of {assessment?.activity_goal_count} activities
                   </div>
                   <div className="leading-none text-muted-foreground">
-                    Showing total activities for this month
+                    Showing total activities
                   </div>
                 </CardFooter>
               </Card>
 
               {/* logs */}
-              <div className="flex flex-col flex-1 col-span-full">
+              <div className="flex flex-col flex-1 gap-3">
                 <h4>Workout Logs</h4>
-                
+
+                <div className="flex flex-col flex-1 gap-3">
+                  {workouts.map((workout) => (
+                    <div
+                      key={workout?.id}
+                      className="flex justify-between p-3 rounded-lg border border-border"
+                    >
+                      <h6 className="font-semibold">{workout?.exercise}</h6>
+                      <div className="flex gap-2">
+                        <div className="flex gap-1 items-center text-sm">
+                          <Clock4Icon size={20} />
+                          {workout?.duration}mins
+                        </div>
+                        <div className="flex gap-1 items-center text-sm">
+                          <BicepsFlexedIcon size={20} />
+                          {workout?.calories_burned}kcal
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

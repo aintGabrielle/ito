@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { toast } from "sonner";
-import useWorkouts from "@/hooks/use-workouts";
+import { Button } from "@/Components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,10 +6,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/Components/ui/dialog";
-import { Button } from "@/Components/ui/button";
-import { PlusCircleIcon } from "lucide-react";
-import { Label } from "@/Components/ui/label";
 import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import useWorkouts from "@/hooks/use-workouts";
+import { PlusCircleIcon } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const AddActivityModal = ({ triggerComponent }) => {
   const { addWorkout } = useWorkouts();
@@ -36,11 +36,14 @@ const AddActivityModal = ({ triggerComponent }) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
             const data = Object.fromEntries(formData);
+
+            console.log(data);
             toast.promise(
               addWorkout?.({
                 exercise: data.exercise,
-                duration: parseInt(data.duration),
+                duration: Number.parseInt(data.duration),
                 date: new Date(),
+                calories_burned: Number.parseInt(data.calories_burned),
               }),
               {
                 loading: "Adding activity",
@@ -64,6 +67,15 @@ const AddActivityModal = ({ triggerComponent }) => {
               type="number"
               name="duration"
               placeholder="Enter duration"
+              className="w-full"
+            />
+          </Label>
+          <Label className="flex flex-col gap-2">
+            <span>Calories burned (kcal)</span>
+            <Input
+              type="number"
+              name="calories_burned"
+              placeholder="Enter calories"
               className="w-full"
             />
           </Label>

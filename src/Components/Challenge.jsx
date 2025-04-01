@@ -1,23 +1,19 @@
-import { useState } from "react";
-import { Button, buttonVariants } from "./ui/button";
-import { Input } from "./ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { ScrollArea } from "./ui/scroll-area";
+import useWorkouts from "@/hooks/use-workouts";
+import { cn } from "@/lib/utils";
+import "chart.js/auto";
 import {
+  BicepsFlexedIcon,
   ChartNoAxesCombinedIcon,
+  Clock4Icon,
   Edit2Icon,
-  EditIcon,
-  PenIcon,
-  PlusCircleIcon,
   TrashIcon,
 } from "lucide-react";
-import { Line } from "react-chartjs-2";
-import "chart.js/auto";
+import { useState } from "react";
 import "react-calendar/dist/Calendar.css";
-import { CalendarFull } from "./ui/calendar-full";
-import FloatingChatbot from "./ui/floating-chatbot";
+import { Line } from "react-chartjs-2";
+import { toast } from "sonner";
 import Nav from "./Nav";
-import useWorkouts from "@/hooks/use-workouts";
+import AddActivityModal from "./pages/challenge/add-activity-modal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,19 +25,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { Button, buttonVariants } from "./ui/button";
+import { CalendarFull } from "./ui/calendar-full";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
+import FloatingChatbot from "./ui/floating-chatbot";
+import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { date } from "zod";
-import AddActivityModal from "./pages/challenge/add-activity-modal";
+import { ScrollArea } from "./ui/scroll-area";
 
 const ActivityCard = ({ workout }) => {
   const { deleteWorkout, updateWorkout } = useWorkouts();
@@ -56,7 +53,16 @@ const ActivityCard = ({ workout }) => {
         <p className="font-semibold">
           {workout?.exercise || "Unknown Exercise"}
         </p>
-        <p className="text-gray-500">{workout?.duration || 0} mins</p>
+        <div className="flex gap-4">
+          <div className="flex gap-1 items-center text-gray-500">
+            <Clock4Icon size={20} />
+            {workout?.duration || 0} mins
+          </div>
+          <div className="flex gap-1 items-center text-gray-500">
+            <BicepsFlexedIcon size={20} />
+            {workout?.calories_burned || 0} kcal
+          </div>
+        </div>
       </div>
       <div className="flex gap-2">
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
@@ -96,6 +102,15 @@ const ActivityCard = ({ workout }) => {
                   type="number"
                   name="duration"
                   defaultValue={workout?.duration}
+                  className="w-full"
+                />
+              </Label>
+              <Label className="flex flex-col gap-2">
+                <span>Calories Burned</span>
+                <Input
+                  type="number"
+                  name="calories_burned"
+                  defaultValue={workout?.calories_burned}
                   className="w-full"
                 />
               </Label>

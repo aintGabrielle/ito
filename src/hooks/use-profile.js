@@ -1,6 +1,6 @@
-import useSWR, { mutate } from "swr";
-import { useState } from "react";
 import { supabase } from "@/supabaseClient";
+import { useState } from "react";
+import useSWR, { mutate } from "swr";
 import useCurrentUser from "./use-current-user";
 
 const fetcher = async (userId) => {
@@ -32,6 +32,8 @@ const useProfile = () => {
 			.from("fitness_assessments")
 			.update(updatedValues)
 			.eq("user_id", user.id);
+
+		console.log(assessment);
 
 		if (!error) {
 			mutate(["fitness_assessments", user.id]);

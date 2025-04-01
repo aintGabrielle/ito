@@ -1,6 +1,24 @@
+import useProfile from "@/hooks/use-profile";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Edit2Icon, SaveIcon, UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import Nav from "./Nav";
 import { Button } from "./ui/button";
+import { DateRangePicker } from "./ui/date-range-picker";
+import FloatingChatbot from "./ui/floating-chatbot";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import { Input } from "./ui/input";
+import { ScrollArea } from "./ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -8,12 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { toast } from "sonner";
-import Nav from "./Nav";
-import { ScrollArea } from "./ui/scroll-area";
-import { Edit2Icon, UserIcon, SaveIcon } from "lucide-react";
-import useProfile from "@/hooks/use-profile";
-import FloatingChatbot from "./ui/floating-chatbot";
 
 const fitnessOptions = {
   goal: [
@@ -40,10 +52,29 @@ const fitnessOptions = {
   ],
 };
 
+const fitnessFormSchema = z.object({
+  height: z.number(),
+  weight: z.number(),
+  goal: z.enum(["lose_weight", "maintain_weight", "gain_muscle"]),
+  workoutLevel: z.enum(["beginner", "intermediate", "advanced"]),
+  focusMuscle: z.enum(["full_body", "upper_body", "lower_body", "core"]),
+  exerciseType: z.enum(["strength", "cardio", "yoga", "mixed"]),
+  dailyWalking: z.number(),
+  pushups: z.number(),
+  activity_goal_count: z.number(),
+  activity_goal_duration: z.string(),
+  calorie_goal_count: z.number(),
+  calorie_goal_duration: z.string(),
+});
+
 const Profile = () => {
   const { assessment, loading, updateAssessment } = useProfile();
   const [tempValues, setTempValues] = useState(assessment);
   const [isEditing, setIsEditing] = useState(false);
+  const form = useForm({
+    resolver: zodResolver(fitnessFormSchema),
+    defaultValues: assessment,
+  });
 
   useEffect(() => {
     if (assessment) setTempValues(assessment);
@@ -53,8 +84,8 @@ const Profile = () => {
     setTempValues((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async () => {
-    await updateAssessment(tempValues);
+  const handleSave = async (e) => {
+    await updateAssessment(form.getValues());
     setIsEditing(false);
     toast.success("Fitness assessment updated successfully!");
   };
@@ -71,19 +102,9 @@ const Profile = () => {
             </div>
 
             <div className="flex gap-2 items-center">
-              {!isEditing ? (
+              {!isEditing && (
                 <Button onClick={() => setIsEditing(true)}>
                   <Edit2Icon className="mr-2" /> Edit
-                </Button>
-              ) : (
-                <Button onClick={handleSave} disabled={loading}>
-                  {loading ? (
-                    "Saving..."
-                  ) : (
-                    <>
-                      <SaveIcon className="mr-2" /> Save Changes
-                    </>
-                  )}
                 </Button>
               )}
               {isEditing && (
@@ -101,68 +122,331 @@ const Profile = () => {
           </div>
 
           {assessment ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <EditableStatRow
-                label="Height"
-                value={tempValues.height}
-                field="height"
-                editing={isEditing}
-                onChange={handleChange}
-              />
-              <EditableStatRow
-                label="Weight"
-                value={tempValues.currentWeight}
-                field="currentWeight"
-                editing={isEditing}
-                onChange={handleChange}
-              />
-              <EditableStatRow
-                label="Goal"
-                value={tempValues.goal}
-                field="goal"
-                editing={isEditing}
-                onChange={handleChange}
-                options={fitnessOptions.goal}
-              />
-              <EditableStatRow
-                label="Workout Level"
-                value={tempValues.workoutLevel}
-                field="workoutLevel"
-                editing={isEditing}
-                onChange={handleChange}
-                options={fitnessOptions.workoutLevel}
-              />
-              <EditableStatRow
-                label="Preferred Muscle Focus"
-                value={tempValues.focusMuscle}
-                field="focusMuscle"
-                editing={isEditing}
-                onChange={handleChange}
-                options={fitnessOptions.focusMuscle}
-              />
-              <EditableStatRow
-                label="Exercise Type"
-                value={tempValues.exerciseType}
-                field="exerciseType"
-                editing={isEditing}
-                onChange={handleChange}
-                options={fitnessOptions.exerciseType}
-              />
-              <EditableStatRow
-                label="Daily Walking"
-                value={tempValues.dailyWalking}
-                field="dailyWalking"
-                editing={isEditing}
-                onChange={handleChange}
-              />
-              <EditableStatRow
-                label="Push-ups Capacity"
-                value={tempValues.pushups}
-                field="pushups"
-                editing={isEditing}
-                onChange={handleChange}
-              />
-            </div>
+            <Form {...form}>
+              <form
+                className="grid grid-cols-1 gap-4 md:grid-cols-2"
+                onSubmit={form.handleSubmit(handleSave)}
+              >
+                <FormField
+                  control={form.control}
+                  name="height"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Height (cm)</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} disabled={!isEditing} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="currentWeight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Weight (kg)</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} disabled={!isEditing} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="goal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Goal</FormLabel>
+                      <Select
+                        disabled={!isEditing}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your goal" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {fitnessOptions.goal.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="workoutLevel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Workout Level</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={!isEditing}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your activity level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {fitnessOptions.workoutLevel.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="focusMuscle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preffered Muscle Focus</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={!isEditing}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your muscle focus" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {fitnessOptions.focusMuscle.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="exerciseType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exercise Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={!isEditing}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your exercise type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {fitnessOptions.exerciseType.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dailyWalking"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Daily Walking</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} disabled={!isEditing} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="pushups"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Push-ups Capacity</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} disabled={!isEditing} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="activity_goal_count"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Activity Goal Count</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          disabled={!isEditing}
+                          defaultValue={field.value}
+                          onChange={(e) =>
+                            field.onChange(Number.parseInt(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="activity_goal_duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Activity Goal Duration</FormLabel>
+                      <FormControl>
+                        <DateRangePicker
+                          disabled={!isEditing}
+                          onUpdate={(e) =>
+                            field.onChange(
+                              String(
+                                `${e.range.from
+                                  .toISOString()
+                                  .slice(0, 10)}|${e.range.to
+                                  .toISOString()
+                                  .slice(0, 10)}`
+                              )
+                            )
+                          }
+                          initialDateFrom={
+                            form
+                              .getValues("activity_goal_duration")
+                              ?.split("|")[0]
+                              ? new Date(
+                                  String(
+                                    form.getValues("activity_goal_duration")
+                                  ).split("|")[0]
+                                )
+                              : new Date()
+                          }
+                          initialDateTo={
+                            form
+                              .getValues("activity_goal_duration")
+                              ?.split("|")[1]
+                              ? new Date(
+                                  String(
+                                    form.getValues("activity_goal_duration")
+                                  ).split("|")[1]
+                                )
+                              : new Date()
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="calorie_goal_count"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Calorie Goal Count</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          defaultValue={field.value}
+                          onChange={(e) =>
+                            field.onChange(Number.parseInt(e.target.value))
+                          }
+                          disabled={!isEditing}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="calorie_goal_duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Calorie Goal Duration</FormLabel>
+                      <FormControl>
+                        <DateRangePicker
+                          disabled={!isEditing}
+                          onUpdate={(e) =>
+                            field.onChange(
+                              `${e.range.from
+                                .toISOString()
+                                .slice(0, 10)}|${e.range.to
+                                .toISOString()
+                                .slice(0, 10)}`
+                            )
+                          }
+                          initialDateFrom={
+                            form
+                              .getValues("calorie_goal_duration")
+                              ?.split("|")[0]
+                              ? new Date(
+                                  String(
+                                    form.getValues("calorie_goal_duration")
+                                  ).split("|")[0]
+                                )
+                              : new Date()
+                          }
+                          initialDateTo={
+                            form
+                              .getValues("calorie_goal_duration")
+                              ?.split("|")[1]
+                              ? new Date(
+                                  String(
+                                    form.getValues("calorie_goal_duration")
+                                  ).split("|")[1]
+                                )
+                              : new Date()
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="col-span-full">
+                  {isEditing && (
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      onClick={handleSave}
+                      disabled={loading || !form.formState.isDirty}
+                    >
+                      {loading ? (
+                        "Saving..."
+                      ) : (
+                        <>
+                          <SaveIcon className="mr-2" /> Save Changes
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </Form>
           ) : (
             <p className="text-center">No fitness assessment found.</p>
           )}
@@ -209,7 +493,7 @@ const EditableStatRow = ({
           type="number"
           value={value || ""}
           onChange={(e) => editing && onChange(field, e.target.value)}
-          readOnly={!editing}
+          disabled={!editing}
           className={editing ? "border-input" : "border-transparent"}
         />
       )}
