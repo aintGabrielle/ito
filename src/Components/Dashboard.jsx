@@ -55,7 +55,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (assessment?.user_id) {
-      mutate(); // re-fetch AI suggestions with new data
+      mutate();
     }
   }, [assessment, mutate]);
 
@@ -88,7 +88,7 @@ const Dashboard = () => {
                 <div className="flex gap-4 items-center">
                   <p className="flex items-center">
                     <TargetIcon size={20} className="mr-2" />
-                    Weight Goal:
+                    Weight Goal: {assessment?.currentWeight} kg
                   </p>
                   <p className="font-semibold">{targetWeight} kg</p>
                 </div>
