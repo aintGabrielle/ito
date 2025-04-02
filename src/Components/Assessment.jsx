@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/Components/ui/select";
 import useCurrentUser from "@/hooks/use-current-user";
 import { UploadIcon } from "lucide-react";
 import useProfile from "@/hooks/use-profile";
