@@ -100,22 +100,25 @@ const Dashboard = () => {
         </ScrollArea>
         <FloatingChatbot />
       </div>
-      <Dialog open={!assessment?.user_id}>
-        <DialogContent canClose={false}>
-          <DialogHeader>
-            <DialogTitle>No Assessment Found</DialogTitle>
-            <DialogDescription>
-              You haven't completed your fitness assessment yet. In order to get
-              a personalized diet plan, please complete your fitness assessment.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => navigate("/assessment")}>
-              Go to Assessment
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {assessment !== undefined && (
+        <Dialog open={!assessment?.user_id}>
+          <DialogContent canClose={false}>
+            <DialogHeader>
+              <DialogTitle>No Assessment Found</DialogTitle>
+              <DialogDescription>
+                You haven't completed your fitness assessment yet. In order to
+                get a personalized diet plan, please complete your fitness
+                assessment.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button onClick={() => navigate("/assessment")}>
+                Go to Assessment
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };
