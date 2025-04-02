@@ -34,8 +34,7 @@ const EnhancedSuggestions = () => {
                 className="object-cover w-full h-40"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src =
-                    "https://source.unsplash.com/random/800x600/?fitness";
+                  e.target.src = "https://source.unsplash.com/800x600/?fitness";
                 }}
               />
               <CardHeader className="p-4 bg-white">

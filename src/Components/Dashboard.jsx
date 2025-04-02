@@ -22,6 +22,7 @@ import {
 import FloatingChatbot from "./ui/floating-chatbot";
 import { ScrollArea } from "./ui/scroll-area";
 import { Skeleton } from "./ui/skeleton";
+import { useEffect } from "react";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -99,7 +100,7 @@ const Dashboard = () => {
         </ScrollArea>
         <FloatingChatbot />
       </div>
-      <Dialog open={showAssessmentModal}>
+      <Dialog open={"user_id" in assessment ? false : true}>
         <DialogContent canClose={false}>
           <DialogHeader>
             <DialogTitle>No Assessment Found</DialogTitle>

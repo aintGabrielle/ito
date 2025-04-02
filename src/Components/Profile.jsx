@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { CircleHelp } from "lucide-react";
 
 const fitnessOptions = {
   goal: [
@@ -296,7 +298,17 @@ const Profile = () => {
                   name="activity_goal_count"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Activity Goal Count</FormLabel>
+                      <Popover>
+                        <PopoverTrigger>
+                          <div className="flex items-center gap-2">
+                            <FormLabel>Activity Goal Count </FormLabel>
+                            <CircleHelp className="text-primary" size={18} />
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent align="start">
+                          How often do you workout based on the duration
+                        </PopoverContent>
+                      </Popover>
                       <FormControl>
                         <Input
                           type="number"
@@ -317,7 +329,18 @@ const Profile = () => {
                   name="activity_goal_duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Activity Goal Duration</FormLabel>
+                      <Popover>
+                        <PopoverTrigger>
+                          <div className="flex items-center gap-2">
+                            <FormLabel>Activity Goal Duration </FormLabel>
+                            <CircleHelp className="text-primary" size={18} />
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent align="start">
+                          How many days do you want to workout in your specific
+                          duration?
+                        </PopoverContent>
+                      </Popover>
                       <FormControl>
                         <DateRangePicker
                           disabled={!isEditing}
@@ -365,7 +388,18 @@ const Profile = () => {
                   name="calorie_goal_count"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Calorie Goal Count</FormLabel>
+                      <Popover>
+                        <PopoverTrigger>
+                          <div className="flex items-center gap-2">
+                            <FormLabel>Calorie Goal Count </FormLabel>
+                            <CircleHelp className="text-primary" size={18} />
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent align="start">
+                          How many calories do you want to burn in your specific
+                          duration? (Kcal)
+                        </PopoverContent>
+                      </Popover>
                       <FormControl>
                         <Input
                           type="number"
@@ -385,7 +419,17 @@ const Profile = () => {
                   name="calorie_goal_duration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Calorie Goal Duration</FormLabel>
+                      <Popover>
+                        <PopoverTrigger>
+                          <div className="flex items-center gap-2">
+                            <FormLabel>Calorie Goal Duration </FormLabel>
+                            <CircleHelp className="text-primary" size={18} />
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent align="start">
+                          For how long do you want to burn the calories?
+                        </PopoverContent>
+                      </Popover>
                       <FormControl>
                         <DateRangePicker
                           disabled={!isEditing}
