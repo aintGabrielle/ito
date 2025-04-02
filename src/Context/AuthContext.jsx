@@ -90,7 +90,7 @@ export const AuthContextProvider = ({ children }) => {
       const redirectURL =
         import.meta.env.MODE === "localhost"
           ? "http://localhost:5174/auth-redirect"
-          : "https://fitmission-zeta.vercel.app/auth-redirect";
+          : "https://devops-fitmission-app.vercel.app/auth-redirect";
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
