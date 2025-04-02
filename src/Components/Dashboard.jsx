@@ -21,6 +21,7 @@ import {
 } from "./ui/dialog";
 import FloatingChatbot from "./ui/floating-chatbot";
 import { ScrollArea } from "./ui/scroll-area";
+import { Skeleton } from "./ui/skeleton";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
