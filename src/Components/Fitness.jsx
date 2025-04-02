@@ -15,6 +15,7 @@ import {
 } from "./ui/card";
 import CircleProgress from "./ui/circle-progress";
 import { ScrollArea } from "./ui/scroll-area";
+import FloatingChatbot from "./ui/floating-chatbot";
 
 const Fitness = () => {
   const { assessment } = useProfile();
@@ -233,6 +234,7 @@ const Fitness = () => {
           </div>
         </div>
       </ScrollArea>
+      <FloatingChatbot />
     </div>
   );
 };

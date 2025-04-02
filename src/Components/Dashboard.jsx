@@ -84,11 +84,52 @@ const Dashboard = () => {
                 )}
               </div>
               <div className="flex flex-col items-center p-6 rounded-lg shadow-lg bg-card">
-                <h4 className="mb-5 text-primary">Target Weight & Progress</h4>
+                <h4 className="mb-5 text-primary">Basic Statistics</h4>
                 <div className="flex gap-4 items-center">
                   <p className="flex items-center font-bold">
                     <TargetIcon size={20} className="mr-2" />
-                    Weight Goal: {assessment?.currentWeight} kg
+                    Current Weight: {assessment?.currentWeight} kg
+                  </p>
+                </div>
+                <div className="flex gap-4 items-center">
+                  <p className="flex items-center font-bold">
+                    <TargetIcon size={20} className="mr-2" />
+                    Workout Level:{" "}
+                    {assessment?.workoutLevel === "beginner"
+                      ? "Beginner"
+                      : " " || assessment?.workoutLevel === "intermediate"
+                      ? "Intermediate"
+                      : " " || assessment?.workoutLevel === "advanced"
+                      ? "Advanced"
+                      : " "}
+                  </p>
+                </div>
+                <div className="flex gap-4 items-center">
+                  <p className="flex items-center font-bold">
+                    <TargetIcon size={20} className="mr-2" />
+                    Preffered Muscle Focus:{" "}
+                    {assessment?.focusMucle === "core"
+                      ? "Core"
+                      : " " || assessment?.focusMuscle === "full_body"
+                      ? "Full Body"
+                      : " " || assessment?.workoutLevel === "lower_body"
+                      ? "Lower Body"
+                      : " "}
+                  </p>
+                </div>
+                <div className="flex gap-4 items-center">
+                  <p className="flex items-center font-bold">
+                    <TargetIcon size={20} className="mr-2" />
+                    Exercise Type:{" "}
+                    {assessment?.exerciseType === "cardio"
+                      ? "Cardio"
+                      : " " || assessment?.exerciseType === "strength"
+                      ? "Strength"
+                      : " " || assessment?.exerciseType === "yoga"
+                      ? "Yoga"
+                      : " " || assessment?.exerciseType === "mixed"
+                      ? "Mixed"
+                      : " "}
                   </p>
                 </div>
                 <div className="flex gap-4 items-center">

@@ -10,6 +10,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "./ui/accordion";
+import FloatingChatbot from "./ui/floating-chatbot";
 
 const EnhancedSuggestions = () => {
   const { cards, loading } = useEnhancedSuggestions();
@@ -62,6 +63,7 @@ const EnhancedSuggestions = () => {
           </div>
         </div>
       </ScrollArea>
+      <FloatingChatbot />
     </div>
   );
 };
