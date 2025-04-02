@@ -10,7 +10,7 @@ import {
 } from "date-fns";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export function CalendarFull({ onDateSelect, className, selectedDate }) {
