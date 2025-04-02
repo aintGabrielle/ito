@@ -1,76 +1,65 @@
-import useSWR from "swr";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useState } from "react";
+import { DumbbellIcon } from "lucide-react";
+import useEnhancedSuggestions from "@/hooks/use-enhanced-suggestions";
 import Nav from "./Nav";
 import { Skeleton } from "./ui/skeleton";
 import { ScrollArea } from "./ui/scroll-area";
-import { DumbbellIcon } from "lucide-react";
-import useEnhancedSuggestions from "@/hooks/use-enhanced-suggestions";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "./ui/accordion";
 
 const EnhancedSuggestions = () => {
-  const { cards, loading, selectedCard, setSelectedCard, getImageURL } =
-    useEnhancedSuggestions();
+  const { cards, loading } = useEnhancedSuggestions();
 
-  const handleCardClick = (card) => {
-    setSelectedCard(card.title === selectedCard?.title ? null : card);
-  };
-
-  const renderCards = (type) => {
+  const renderAccordion = (type) => {
     const filtered = cards.filter((c) => c.type === type);
+
     return (
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+      <Accordion type="single" collapsible className="w-full">
         {filtered.map((item, i) => (
-          <motion.div
-            key={`card-${i}`}
-            layout
-            whileTap={{ scale: 0.97 }}
-            onClick={() => handleCardClick(item)}
-            className="cursor-pointer"
-          >
-            <Card className="overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 hover:shadow-xl">
-              <img
-                src={getImageURL(item)}
-                alt={item.title}
-                className="object-cover w-full h-40"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "https://source.unsplash.com/800x600/?fitness";
-                }}
-              />
-              <CardHeader className="p-4 bg-white">
-                <CardTitle className="text-xl font-semibold text-gray-800">
-                  {item.title}
-                </CardTitle>
-              </CardHeader>
-              {selectedCard?.title === item.title && (
-                <CardContent className="p-4 text-sm text-gray-600 bg-gray-50">
-                  {item.description}
-                </CardContent>
-              )}
-            </Card>
-          </motion.div>
+          <AccordionItem key={i} value={`${item.title}-${i}`}>
+            <AccordionTrigger>{item.title}</AccordionTrigger>
+            <AccordionContent>{item.description}</AccordionContent>
+          </AccordionItem>
         ))}
-      </div>
+      </Accordion>
     );
   };
 
   return (
-    <div className="flex h-full min-h-screen">
+    <div className="flex min-h-screen">
       <Nav />
       <ScrollArea className="flex-1 h-screen">
-        <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
-          <div className="flex gap-4 items-center mb-10">
-            <DumbbellIcon size={40} />
-            <h3>Challenges</h3>
+        <div className="flex flex-col gap-6 p-6 pt-20 max-w-3xl mx-auto md:pt-6">
+          <div className="flex items-center gap-4 mb-6">
+            <DumbbellIcon size={32} />
+            <h3 className="text-2xl font-bold">Challenges</h3>
           </div>
-          <h2>AI-Suggested Workouts</h2>
-          {loading ? (
-            <Skeleton className="w-full h-10" />
-          ) : (
-            renderCards("workout")
-          )}
-          <h2>AI-Suggested Diet Plans</h2>
-          {loading ? <Skeleton className="w-full h-10" /> : renderCards("diet")}
+
+          <div>
+            <h2 className="text-lg font-semibold mb-2">
+              AI-Suggested Workouts
+            </h2>
+            {loading ? (
+              <Skeleton className="w-full h-10" />
+            ) : (
+              renderAccordion("workout")
+            )}
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold mt-4 mb-2">
+              AI-Suggested Diet Plans
+            </h2>
+            {loading ? (
+              <Skeleton className="w-full h-10" />
+            ) : (
+              renderAccordion("diet")
+            )}
+          </div>
         </div>
       </ScrollArea>
     </div>
