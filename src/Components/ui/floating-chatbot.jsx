@@ -12,7 +12,7 @@ import { Avatar } from "./avatar";
 import { ScrollArea } from "./scroll-area";
 import { Textarea } from "./textarea";
 import { motion } from "framer-motion";
-import { ChatBubble } from "./chat-bubble";
+import { ChatBubble } from "@/Components/ui/chat-bubble";
 import useChatbot from "@/hooks/use-chatbot";
 
 const FloatingChatbot = () => {
