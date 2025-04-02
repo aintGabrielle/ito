@@ -86,11 +86,10 @@ const Dashboard = () => {
               <div className="flex flex-col items-center p-6 rounded-lg shadow-lg bg-card">
                 <h4 className="mb-5 text-primary">Target Weight & Progress</h4>
                 <div className="flex gap-4 items-center">
-                  <p className="flex items-center">
+                  <p className="flex items-center font-bold">
                     <TargetIcon size={20} className="mr-2" />
                     Weight Goal: {assessment?.currentWeight} kg
                   </p>
-                  <p className="font-semibold">{targetWeight} kg</p>
                 </div>
                 <div className="flex gap-4 items-center">
                   <p className="flex items-center">
