@@ -9,7 +9,6 @@ import { useState } from "react";
 import Markdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import Nav from "./Nav";
-import TodaysFocus from "./TodayFocus";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -54,6 +53,12 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (assessment?.user_id) {
+      mutate(); // re-fetch AI suggestions with new data
+    }
+  }, [assessment, mutate]);
+
   return (
     <>
       <div className="flex relative min-h-screen">
@@ -64,7 +69,7 @@ const Dashboard = () => {
               <LayoutGridIcon size={40} />
               <h3>Your Fitness Dashboard</h3>
             </div>
-            <TodaysFocus />
+            {/* <TodaysFocus /> */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="p-6 rounded-lg shadow-lg bg-card">
                 <h4 className="mb-5 text-center text-primary">
