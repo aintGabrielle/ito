@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar } from "@/Components/ui/avatar";
 import { cva } from "class-variance-authority";
 import { forwardRef } from "react";
 

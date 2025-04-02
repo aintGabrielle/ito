@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "./button";
+import { Button } from "@/Components/ui/button";
 import {
   BotIcon,
   Loader2Icon,
