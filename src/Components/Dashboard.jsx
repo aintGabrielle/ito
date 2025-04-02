@@ -100,7 +100,7 @@ const Dashboard = () => {
         </ScrollArea>
         <FloatingChatbot />
       </div>
-      <Dialog open={"user_id" in assessment ? false : true}>
+      <Dialog open={!assessment || !("user_id" in assessment)}>
         <DialogContent canClose={false}>
           <DialogHeader>
             <DialogTitle>No Assessment Found</DialogTitle>
