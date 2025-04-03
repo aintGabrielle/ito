@@ -1,6 +1,7 @@
 import { supabase } from "@/supabaseClient";
 import axios from "axios";
-import useSWR, { mutate } from "swr";
+import { useState } from "react";
+import useSWR from "swr";
 import useCurrentUser from "./use-current-user";
 
 const fetcher = async (userId) => {
@@ -18,37 +19,29 @@ const fetcher = async (userId) => {
 
 const useChatbot = () => {
   const { user } = useCurrentUser();
-  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-
   const {
     data: messages = [],
     isLoading,
     error,
-  } = useSWR(user ? ["chat_messages", user.id] : null, () => fetcher(user.id), {
-    keepPreviousData: true,
-  });
+    mutate,
+  } = useSWR(`/chat_messages_${user.id}`, async () => fetcher(user.id));
+  const [tempMessages, setTempMessages] = useState(messages);
 
   const sendMessage = async (userInput) => {
     if (!userInput.trim() || !user) return;
+    const newUserMessage = { role: "user", message: userInput };
+    const t = tempMessages;
+    setTempMessages([...t, newUserMessage]);
 
-    const newUserMessage = {
-      role: "user",
-      message: userInput,
-      user_id: user.id,
-    };
-
-    // Optimistic UI update
-    mutate(
-      ["chat_messages", user.id],
-      (prev = []) => [...prev, newUserMessage],
-      false
-    );
+    mutate(`/chat_messages_${user.id}`, {
+      revalidate: true,
+      optimisticData: [...tempMessages, newUserMessage],
+    });
 
     // Insert user message to Supabase
     await supabase.from("chat_messages").insert(newUserMessage);
 
     try {
-      // Send to OpenAI
       const res = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
@@ -65,13 +58,15 @@ const useChatbot = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${OPENAI_API_KEY}`,
+            Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
             "Content-Type": "application/json",
           },
         }
       );
 
       const botResponse = res.data.choices[0].message.content;
+      const newBotMessage = { role: "bot", message: botResponse };
+      // setTempMessages(t);
 
       const newBotMessage = {
         role: "bot",
@@ -82,14 +77,14 @@ const useChatbot = () => {
       // Insert bot message to Supabase
       await supabase.from("chat_messages").insert(newBotMessage);
 
-      // Update SWR cache
-      mutate(["chat_messages", user.id]);
+      setTempMessages([...t, newUserMessage, newBotMessage]);
+      mutate();
     } catch (error) {
       console.error("Chatbot request failed:", error);
     }
   };
 
-  return { messages, loading: isLoading, error, sendMessage };
+  return { messages, loading: isLoading, error, sendMessage, tempMessages };
 };
 
 export default useChatbot;
