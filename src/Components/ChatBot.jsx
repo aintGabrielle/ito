@@ -1,3 +1,4 @@
+import { ChatBubble } from "@/Components/ui/chat-bubble";
 import { useAuth } from "@/Context/AuthContext";
 import useCurrentUser from "@/hooks/use-current-user";
 import axios from "axios";
@@ -7,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../supabaseClient";
 import Nav from "./Nav";
 import { Button } from "./ui/button";
-import { ChatBubble } from "./ui/chat-bubble";
 import { ScrollArea } from "./ui/scroll-area";
 import { Textarea } from "./ui/textarea";
 
