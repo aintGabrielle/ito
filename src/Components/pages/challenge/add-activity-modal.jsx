@@ -1,21 +1,88 @@
-import { Button } from "@/Components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PlusCircleIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/Components/ui/dialog";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import useWorkouts from "@/hooks/use-workouts";
-import { PlusCircleIcon } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
-const AddActivityModal = ({ triggerComponent }) => {
+// Schema validation
+const formSchema = z.object({
+  exercise: z.string().min(1, "Activity name is required"),
+  duration: z
+    .string()
+    .min(1, "Duration is required")
+    .regex(/^\d+$/, "Must be a number")
+    .refine((val) => Number.parseInt(val, 10) > 0, {
+      message: "Duration must be greater than 0",
+    }),
+});
+
+const AddActivityModal = ({ triggerComponent, assessment }) => {
   const { addWorkout } = useWorkouts();
   const [isAddingWorkout, setIsAddingWorkout] = useState(false);
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      exercise: "",
+      duration: "",
+    },
+    mode: "onChange", // Validate as user types
+  });
+
+  // Watch duration input
+  const duration = useWatch({
+    control: form.control,
+    name: "duration",
+  });
+
+  // Get weight from assessment (default: 70kg)
+  const weight = assessment?.weight || 70;
+
+  // Convert minutes to hours & calculate calories
+  const durationInHours = duration ? Number.parseInt(duration, 10) / 60 : 0;
+  const calculatedCalories = Number.parseFloat(
+    (4.5 * weight * durationInHours).toFixed(2)
+  );
+
+  const onSubmit = async (data) => {
+    toast.promise(
+      addWorkout?.({
+        exercise: data.exercise,
+        duration: Number.parseInt(data.duration, 10),
+        date: new Date(),
+        calories_burned: calculatedCalories,
+      }),
+      {
+        loading: "Adding activity...",
+        success: () => {
+          setIsAddingWorkout(false);
+          form.reset();
+          return "Activity added successfully";
+        },
+        error: "Failed to add activity",
+      }
+    );
+  };
 
   return (
     <Dialog open={isAddingWorkout} onOpenChange={setIsAddingWorkout}>
@@ -31,65 +98,82 @@ const AddActivityModal = ({ triggerComponent }) => {
         <DialogHeader>
           <DialogTitle>Add Activity</DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            const data = Object.fromEntries(formData);
 
-            console.log(data);
-            toast.promise(
-              addWorkout?.({
-                exercise: data.exercise,
-                duration: Number.parseInt(data.duration),
-                date: new Date(),
-                calories_burned: Number.parseInt(data.calories_burned),
-              }),
-              {
-                loading: "Adding activity",
-                success: () => {
-                  setIsAddingWorkout(false);
-                  return "Activity added successfully";
-                },
-                error: "Failed to add activity",
-              }
-            );
-          }}
-          className="flex flex-col gap-4 mt-5"
-        >
-          <Label className="flex flex-col gap-2">
-            <span>Activity Name</span>
-            <Input name="exercise" placeholder="Enter exercise name" />
-          </Label>
-          <Label className="flex flex-col gap-2">
-            <span>Duration (in minutes)</span>
-            <Input
-              type="number"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4 mt-5"
+          >
+            {/* Activity Name */}
+            <FormField
+              control={form.control}
+              name="exercise"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Activity Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter exercise name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Duration */}
+            <FormField
+              control={form.control}
               name="duration"
-              placeholder="Enter duration"
-              className="w-full"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Duration (in minutes)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...field}
+                      placeholder="Enter duration"
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </Label>
-          <Label className="flex flex-col gap-2">
-            <span>Calories burned (kcal)</span>
-            <Input
-              type="number"
-              name="calories_burned"
-              placeholder="Enter calories"
-              className="w-full"
-            />
-          </Label>
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsAddingWorkout(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">Add</Button>
-          </div>
-        </form>
+
+            {/* Calories Burned (Readonly) */}
+            {form.getValues("exercise") && duration && (
+              <div className="p-3 text-center bg-gray-50 rounded-md border border-gray-300">
+                <p className="text-sm text-gray-700">
+                  🔥 You burned{" "}
+                  <span className="font-semibold text-black">
+                    {calculatedCalories} kcal
+                  </span>{" "}
+                  by doing{" "}
+                  <span className="font-semibold text-black">
+                    {form.getValues("exercise")}
+                  </span>{" "}
+                  for{" "}
+                  <span className="font-semibold text-black">
+                    {duration} min
+                  </span>
+                </p>
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAddingWorkout(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={!form.formState.isValid}>
+                Add
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

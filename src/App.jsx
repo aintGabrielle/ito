@@ -1,41 +1,44 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import "./index.css";
 import { Link } from "react-router-dom";
 import LandingNav from "./Components/LandingNav";
+import Nav from "./Components/Nav";
 import { Button } from "./Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./Components/ui/card";
+import "./index.css";
 
 function FeatureSection({ title, description, imageSrc, imageAlt, imageLeft }) {
   return (
-    <div className="grid grid-cols-1 gap-8 items-center md:grid-cols-2">
-      <motion.div
-        initial={{ opacity: 0, x: imageLeft ? -30 : 0 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className={`flex justify-center ${
-          imageLeft ? "md:order-1" : "md:order-2"
-        }`}
-      >
-        <img
-          src={imageSrc || "/placeholder.svg"}
-          alt={imageAlt}
-          className="w-[300px] md:max-w-[400px] md:w-full"
-        />
-      </motion.div>
+    <>
+      <div className="grid grid-cols-1 gap-8 items-center md:grid-cols-2">
+        <motion.div
+          initial={{ opacity: 0, x: imageLeft ? -30 : 0 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className={`flex justify-center ${
+            imageLeft ? "md:order-1" : "md:order-2"
+          }`}
+        >
+          <img
+            src={imageSrc || "/placeholder.svg"}
+            alt={imageAlt}
+            className="w-[300px] md:max-w-[400px] md:w-full"
+          />
+        </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, x: imageLeft ? 30 : -30 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className={`${imageLeft ? "md:order-2" : "md:order-1"}`}
-      >
-        <h3 className="text-secondary">{title}</h3>
-        <p>{description}</p>
-      </motion.div>
-    </div>
+        <Nav />
+        <motion.div
+          initial={{ opacity: 0, x: imageLeft ? 30 : -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className={`${imageLeft ? "md:order-2" : "md:order-1"}`}
+        >
+          <h3 className="text-secondary">{title}</h3>
+          <p>{description}</p>
+        </motion.div>
+      </div>
+    </>
   );
 }
 
