@@ -34,7 +34,7 @@ const Fitness = () => {
   return (
     <div className="flex relative min-h-screen">
       <Nav />
-      <ScrollArea className="flex-1 p-6 h-screen">
+      <ScrollArea className="flex-1 p-6 h-full">
         <div className="space-y-6">
           <div className="flex gap-4 items-center">
             <BicepsFlexedIcon size={40} />

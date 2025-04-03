@@ -33,7 +33,7 @@ const EnhancedSuggestions = () => {
   return (
     <div className="flex min-h-screen">
       <Nav />
-      <ScrollArea className="flex-1 h-screen">
+      <ScrollArea className="flex-1 h-full">
         <div className="flex flex-col gap-6 p-6 pt-20 max-w-3xl mx-auto md:pt-6">
           <div className="flex items-center gap-4 mb-6">
             <DumbbellIcon size={32} />
