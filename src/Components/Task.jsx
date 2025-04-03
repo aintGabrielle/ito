@@ -31,7 +31,7 @@ const EnhancedSuggestions = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen z-50">
       <Nav />
       <ScrollArea className="flex-1 h-full">
         <div className="flex flex-col gap-6 p-6 pt-20 max-w-3xl mx-auto md:pt-6">
