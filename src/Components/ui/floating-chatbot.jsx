@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import { Button } from "@/Components/ui/button";
+import ChatBubble from "@/Components/ui/chat-bubble";
+import useChatbot from "@/hooks/use-chatbot";
+import { motion } from "framer-motion";
 import {
   BotIcon,
   Loader2Icon,
@@ -7,13 +9,11 @@ import {
   SendIcon,
   XIcon,
 } from "lucide-react";
-import { Card, CardContent, CardHeader } from "./card";
+import { useEffect, useRef, useState } from "react";
 import { Avatar } from "./avatar";
+import { Card, CardContent, CardHeader } from "./card";
 import { ScrollArea } from "./scroll-area";
 import { Textarea } from "./textarea";
-import { motion } from "framer-motion";
-import { ChatBubble } from "@/Components/ui/chat-bubble";
-import useChatbot from "@/hooks/use-chatbot";
 
 const FloatingChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);

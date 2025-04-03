@@ -1,6 +1,6 @@
-import useSWR, { mutate } from "swr";
-import axios from "axios";
 import { supabase } from "@/supabaseClient";
+import axios from "axios";
+import useSWR, { mutate } from "swr";
 import useCurrentUser from "./use-current-user";
 
 const fetcher = async (userId) => {
@@ -60,7 +60,7 @@ const useChatbot = () => {
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${API_KEY.trim()}`,
+						Authorization: `Bearer ${import.meta.VITE_OPENAI_API_KEY}`,
 						"Content-Type": "application/json",
 					},
 				},
