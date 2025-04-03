@@ -1,15 +1,15 @@
+import { useState, useEffect, useRef } from "react";
+import { supabase } from "../supabaseClient";
+import axios from "axios";
+import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
+import { motion } from "framer-motion";
+import Nav from "./Nav";
+import { BotIcon, Loader2, SendIcon } from "lucide-react";
+import { Textarea } from "./ui/textarea";
+import { ChatBubble } from "@/Components/ui/chat-bubble";
 import { useAuth } from "@/Context/AuthContext";
 import useCurrentUser from "@/hooks/use-current-user";
-import axios from "axios";
-import { motion } from "framer-motion";
-import { BotIcon, Loader2, SendIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { supabase } from "../supabaseClient";
-import Nav from "./Nav";
-import { Button } from "./ui/button";
-import ChatBubble from "./ui/chat-bubble";
-import { ScrollArea } from "./ui/scroll-area";
-import { Textarea } from "./ui/textarea";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -103,14 +103,14 @@ const ChatBot = () => {
       <ScrollArea className="w-full">
         <div className="flex relative flex-col mx-auto w-full max-w-2xl min-h-screen">
           {/* Header */}
-          <div className="flex sticky top-0 z-10 gap-4 items-center py-4 bg-background">
+          <div className="flex sticky top-0 gap-4 items-center py-4 bg-background z-10">
             <BotIcon size={40} />
             <h3 className="text-lg font-semibold">AI Fitness Coach</h3>
           </div>
 
           {/* Chat area */}
           <div
-            className="overflow-y-auto flex-1 px-2 pt-4 pb-24 space-y-3"
+            className="flex-1 pt-4 pb-24 px-2 space-y-3 overflow-y-auto"
             ref={scrollContainerRef}
           >
             {messages.map((msg, index) => (
