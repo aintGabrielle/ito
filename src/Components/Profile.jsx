@@ -95,7 +95,7 @@ const Profile = () => {
   return (
     <div className="flex relative min-h-screen">
       <Nav />
-      <ScrollArea className="flex-1 h-screen">
+      <ScrollArea className="flex-1 h-full">
         <div className="flex flex-col flex-1 gap-2 p-5 pt-20 mx-auto w-full md:pt-5">
           <div className="flex justify-between items-center mb-10">
             <div className="flex gap-4 items-center">
