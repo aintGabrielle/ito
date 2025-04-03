@@ -215,7 +215,7 @@ const ChallengeManager = () => {
                   <AddActivityModal />
                 </CardHeader>
                 <CardContent>
-                  {workouts.length === 0 ? (
+                  {workouts === undefined ? null : workouts.length === 0 ? (
                     <p className="text-gray-500">No workouts logged yet.</p>
                   ) : (
                     <ul>
