@@ -1,6 +1,7 @@
 import { supabase } from "@/supabaseClient";
 import axios from "axios";
-import useSWR, { mutate } from "swr";
+import { useState } from "react";
+import useSWR from "swr";
 import useCurrentUser from "./use-current-user";
 
 const fetcher = async (userId) => {
@@ -21,21 +22,20 @@ const useChatbot = () => {
 		data: messages = [],
 		isLoading,
 		error,
-	} = useSWR(
-		user ? ["chat_messages", user.id] : null,
-		() => fetcher(user.id),
-		{ keepPreviousData: true }, // Prevents flickering
-	);
+		mutate,
+	} = useSWR(`/chat_messages_${user.id}`, async () => fetcher(user.id));
+	const [tempMessages, setTempMessages] = useState(messages);
 
 	const sendMessage = async (userInput) => {
 		if (!userInput.trim() || !user) return;
-
 		const newUserMessage = { role: "user", message: userInput };
-		mutate(
-			["chat_messages", user.id],
-			(prev = []) => [...prev, newUserMessage],
-			false,
-		);
+		const t = tempMessages;
+		setTempMessages([...t, newUserMessage]);
+
+		mutate(`/chat_messages_${user.id}`, {
+			revalidate: true,
+			optimisticData: [...tempMessages, newUserMessage],
+		});
 
 		await supabase.from("chat_messages").insert({
 			user_id: user.id,
@@ -60,14 +60,15 @@ const useChatbot = () => {
 				},
 				{
 					headers: {
-						Authorization: `Bearer ${import.meta.VITE_OPENAI_API_KEY}`,
+						Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
 						"Content-Type": "application/json",
 					},
 				},
 			);
 
-			const botResponse = res.data.choices[0].message.message;
-			const newBotMessage = { role: "bot", content: botResponse };
+			const botResponse = res.data.choices[0].message.content;
+			const newBotMessage = { role: "bot", message: botResponse };
+			// setTempMessages(t);
 
 			await supabase.from("chat_messages").insert({
 				user_id: user.id,
@@ -75,17 +76,14 @@ const useChatbot = () => {
 				message: botResponse,
 			});
 
-			mutate(
-				["chat_messages", user.id],
-				(prev = []) => [...prev, newUserMessage, newBotMessage],
-				false,
-			);
+			setTempMessages([...t, newUserMessage, newBotMessage]);
+			mutate();
 		} catch (error) {
 			console.error("Chatbot request failed:", error);
 		}
 	};
 
-	return { messages, loading: isLoading, error, sendMessage };
+	return { messages, loading: isLoading, error, sendMessage, tempMessages };
 };
 
 export default useChatbot;

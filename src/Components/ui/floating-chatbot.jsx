@@ -20,7 +20,12 @@ const FloatingChatbot = () => {
   const [input, setInput] = useState("");
   const scrollContainerRef = useRef(null);
 
-  const { messages, loading, sendMessage } = useChatbot();
+  const {
+    messages: chatbotmessages,
+    loading,
+    sendMessage,
+    tempMessages,
+  } = useChatbot();
 
   const handleSendMessage = () => {
     if (!input.trim() || loading) return;
@@ -32,7 +37,7 @@ const FloatingChatbot = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollIntoView(false);
     }
-  }, [messages, isOpen]);
+  }, [tempMessages, isOpen]);
 
   return (
     <div className="fixed right-4 bottom-4 z-50">
@@ -63,7 +68,7 @@ const FloatingChatbot = () => {
             <CardContent className="overflow-hidden p-0">
               <ScrollArea className="flex relative flex-col gap-2 h-[50dvh]">
                 <div ref={scrollContainerRef} className="flex-1 p-4">
-                  {messages?.map((msg, index) => (
+                  {tempMessages?.map((msg, index) => (
                     <ChatBubble
                       key={`chat-${index}`}
                       variant={msg.role === "user" ? "outline" : "default"}
