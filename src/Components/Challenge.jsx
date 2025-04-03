@@ -160,11 +160,11 @@ const ChallengeManager = () => {
   const [date, setDate] = useState(new Date());
 
   const workoutGraphData = {
-    labels: workouts.map((workout) => workout?.date || "Unknown Date"),
+    labels: workouts?.map((workout) => workout?.date || "Unknown Date"),
     datasets: [
       {
         label: "Workout Duration (mins)",
-        data: workouts.map((workout) => workout?.duration || 0),
+        data: workouts?.map((workout) => workout?.duration || 0),
         borderColor: "rgb(75, 192, 192)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.4,
@@ -234,7 +234,7 @@ const ChallengeManager = () => {
                   <CardTitle>Progress Chart</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {workouts.length > 0 ? (
+                  {workouts?.length > 0 ? (
                     <Line data={workoutGraphData} />
                   ) : (
                     <p>No data available.</p>
