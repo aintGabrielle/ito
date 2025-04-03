@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "../supabaseClient";
 import Nav from "./Nav";
 import { Button } from "./ui/button";
-import ChatBubble from "./ui/chat-bubble";
+import { ChatBubble } from "./ui/chat-bubble";
 import { ScrollArea } from "./ui/scroll-area";
 import { Textarea } from "./ui/textarea";
 

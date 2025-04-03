@@ -1,5 +1,5 @@
 import { Button } from "@/Components/ui/button";
-import ChatBubble from "@/Components/ui/chat-bubble";
+import { ChatBubble } from "@/Components/ui/chat-bubble";
 import useChatbot from "@/hooks/use-chatbot";
 import { motion } from "framer-motion";
 import {
