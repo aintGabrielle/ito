@@ -1,6 +1,5 @@
 import { supabase } from "@/supabaseClient";
 import axios from "axios";
-import { useState } from "react";
 import useSWR from "swr";
 import useCurrentUser from "./use-current-user";
 
@@ -23,11 +22,11 @@ const useChatbot = () => {
 		isLoading,
 		error,
 		mutate,
+		//   } = useSWR(`/chat_messages_${user.id}`, async () => fetcher(user.id));
+		//   const [tempMessages, setTempMessages] = useState(messages);
 	} = useSWR(user?.id ? `/chat_messages_${user.id}` : null, async () =>
 		fetcher(user.id),
 	);
-	const [tempMessages, setTempMessages] = useState(messages);
-
 	const sendMessage = async (userInput) => {
 		if (!userInput.trim() || !user) return;
 		const newUserMessage = { role: "user", message: userInput };
