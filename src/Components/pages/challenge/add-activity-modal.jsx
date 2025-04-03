@@ -6,30 +6,12 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusCircleIcon } from "lucide-react";
-import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
-
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -55,7 +37,6 @@ const formSchema = z.object({
 });
 
 const AddActivityModal = ({ triggerComponent, assessment }) => {
-const AddActivityModal = ({ triggerComponent, assessment }) => {
   const { addWorkout } = useWorkouts();
   const [isAddingWorkout, setIsAddingWorkout] = useState(false);
 
@@ -65,19 +46,16 @@ const AddActivityModal = ({ triggerComponent, assessment }) => {
       exercise: "",
       duration: "",
     },
-    mode: "onChange", // Validate as user types
+    mode: "onChange",
   });
 
-  // Watch duration input
   const duration = useWatch({
     control: form.control,
     name: "duration",
   });
 
-  // Get weight from assessment (default: 70kg)
   const weight = assessment?.weight || 70;
 
-  // Convert minutes to hours & calculate calories
   const durationInHours = duration ? Number.parseInt(duration, 10) / 60 : 0;
   const calculatedCalories = Number.parseFloat(
     (4.5 * weight * durationInHours).toFixed(2)
@@ -123,7 +101,6 @@ const AddActivityModal = ({ triggerComponent, assessment }) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4 mt-5"
           >
-            {/* Activity Name */}
             <FormField
               control={form.control}
               name="exercise"
@@ -138,31 +115,6 @@ const AddActivityModal = ({ triggerComponent, assessment }) => {
               )}
             />
 
-            {/* Duration */}
-            <FormField
-              control={form.control}
-
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4 mt-5"
-          >
-            {/* Activity Name */}
-            <FormField
-              control={form.control}
-              name="exercise"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Activity Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter exercise name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Duration */}
             <FormField
               control={form.control}
               name="duration"
@@ -182,7 +134,6 @@ const AddActivityModal = ({ triggerComponent, assessment }) => {
               )}
             />
 
-            {/* Calories Burned (Readonly) */}
             {form.getValues("exercise") && duration && (
               <div className="p-3 text-center bg-gray-50 rounded-md border border-gray-300">
                 <p className="text-sm text-gray-700">
@@ -202,7 +153,6 @@ const AddActivityModal = ({ triggerComponent, assessment }) => {
               </div>
             )}
 
-            {/* Buttons */}
             <div className="flex gap-2 justify-end">
               <Button
                 type="button"
