@@ -15,12 +15,20 @@ import Task from "./Components/Task";
 import Profile from "./Components/Profile";
 import AuthRedirect from "./Components/AuthRedirect";
 import Forum from "./Components/Forum";
+import Fitness from "./Components/Fitness";
 
 export const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/signin", element: <Signin /> },
   { path: "/signup", element: <Signup /> },
-  { path: "/forum", element: <PrivateRoute><Forum /></PrivateRoute> },
+  {
+    path: "/forum",
+    element: (
+      <PrivateRoute>
+        <Forum />
+      </PrivateRoute>
+    ),
+  },
   {
     path: "/profile",
     element: (
@@ -53,14 +61,14 @@ export const router = createBrowserRouter([
       </PrivateRoute>
     ),
   },
-  {
-    path: "/chatbot",
-    element: (
-      <PrivateRoute>
-        <ChatBot />
-      </PrivateRoute>
-    ),
-  },
+  // {
+  //   path: "/chatbot",
+  //   element: (
+  //     <PrivateRoute>
+  //       <ChatBot />
+  //     </PrivateRoute>
+  //   ),
+  // },
   {
     path: "/started-workout",
     element: (
@@ -104,5 +112,13 @@ export const router = createBrowserRouter([
   {
     path: "/auth-redirect",
     element: <AuthRedirect />,
+  },
+  {
+    path: "/fitness",
+    element: (
+      <PrivateRoute>
+        <Fitness />
+      </PrivateRoute>
+    ),
   },
 ]);

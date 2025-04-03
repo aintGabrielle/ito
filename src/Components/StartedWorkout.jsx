@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import useUser from "../hooks/useUser";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Button } from "./ui/button";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -12,7 +12,7 @@ const supabase = createClient(
 );
 
 const StartedWorkout = () => {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const [workout, setWorkout] = useState(null);
 
   useEffect(() => {
@@ -39,12 +39,12 @@ const StartedWorkout = () => {
   }, [user]);
 
   if (!workout) {
-    return <p className="text-center text-xl">No workout started yet.</p>;
+    return <p className="text-xl text-center">No workout started yet.</p>;
   }
 
   return (
     <div className="flex flex-col items-center p-6">
-      <Card className="max-w-lg p-6">
+      <Card className="p-6 max-w-lg">
         <CardHeader>
           <CardTitle className="text-3xl font-semibold uppercase">
             {workout.workout_title}
@@ -57,7 +57,7 @@ const StartedWorkout = () => {
           src={`/images/challenges/${workout.workout_title
             .toLowerCase()
             .replace(/\s+/g, "")}.jpg`}
-          className="w-full h-64 object-cover rounded-xl"
+          className="object-cover w-full h-64 rounded-xl"
           alt={workout.workout_title}
         />
         <Button className="mt-4 w-full">

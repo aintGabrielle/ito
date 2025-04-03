@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../Context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Checkbox } from "./ui/checkbox";
+import { Button } from "./ui/button";
+import LandingNav from "./LandingNav";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -84,95 +89,91 @@ const Signin = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
-        <div className="text-center">
-          <img
-            src="/images/logo.png"
-            className="w-16 mx-auto mb-2"
-            alt="Logo"
-          />
-          <h1 className="text-2xl font-bold text-green-500">FitMission</h1>
-          <p className="text-gray-600">Sign in to continue</p>
-        </div>
-
-        <form onSubmit={handleSignIn} className="mt-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-green-400 focus:border-green-400"
-              required
+    <>
+      <LandingNav />
+      <div className="flex justify-center items-center px-3 min-h-screen bg-background">
+        <div className="p-5 w-full max-w-md rounded-lg border-2 shadow-lg border-border">
+          <div className="text-center">
+            <img
+              src="/images/logo.png"
+              className="mx-auto mb-2 w-16"
+              alt="Logo"
             />
+            <h3 className="text-primary">FitMission</h3>
+            <p>Sign in to continue</p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              className="w-full px-3 py-2 border rounded-lg shadow-sm focus:ring-green-400 focus:border-green-400"
-              required
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center text-sm text-gray-600">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-                className="mr-2"
+          <form onSubmit={handleSignIn} className="flex flex-col gap-2 mt-2">
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
               />
-              Remember me
-            </label>
-            <Link
-              className="text-sm text-green-500 font-semibold"
-              to="/forgot-password"
-            >
-              Forgot password?
-            </Link>
-          </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-green-500 text-white py-2 rounded-lg text-lg font-semibold hover:bg-green-600 transition-all"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
+            <div>
+              <Label>Password</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
 
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-2 bg-white border py-2 rounded-lg text-lg font-semibold shadow-md hover:bg-gray-100 transition-all"
-          >
-            <FcGoogle className="text-2xl" /> Sign in with Google
-          </button>
-
-          <div className="text-center mt-3">
-            <p className="text-gray-600">
-              Don't have an account?{" "}
-              <Link className="text-green-500 font-semibold" to="/signup">
-                Sign-up
+            <div className="flex justify-between items-center py-3">
+              <Label className="flex items-center text-sm">
+                <Checkbox
+                  checked={rememberMe}
+                  onCheckedChange={() => setRememberMe(!rememberMe)}
+                  className="mr-2"
+                />
+                Remember me
+              </Label>
+              <Link
+                className="text-sm font-semibold text-primary"
+                to="/forgot-password"
+              >
+                Forgot password?
               </Link>
-            </p>
-            <Link className="text-gray-500 text-sm mt-2 block" to="/">
-              Back to home
-            </Link>
-          </div>
-        </form>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full"
+              size="lg"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+
+            <Button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="w-full"
+              variant="outline"
+              size="lg"
+            >
+              <FcGoogle className="text-2xl" /> Sign in with Google
+            </Button>
+
+            <div className="mt-3 text-center">
+              <p>
+                Don't have an account?{" "}
+                <Link className="font-semibold text-primary" to="/signup">
+                  Sign-up
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

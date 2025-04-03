@@ -1,24 +1,22 @@
+import { Button } from "@/Components/ui/button";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { Textarea } from "@/Components/ui/textarea";
 import { useAuth } from "@/Context/AuthContext";
 import useCurrentUser from "@/hooks/use-current-user";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { BotIcon, Loader2, SendIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "../supabaseClient";
-import Nav from "./Nav";
-import { Button } from "./ui/button";
-import ChatBubble from "./ui/chat-bubble";
-import { ScrollArea } from "./ui/scroll-area";
-import { Textarea } from "./ui/textarea";
+import { supabase } from "../../supabaseClient";
+import Nav from "../Nav";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
-const ChatBot = () => {
+const ChatBubble = () => {
   const [input, setInput] = useState("");
-  const { session, signOut } = useAuth();
   const { user } = useCurrentUser();
+  const { session, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef(null);
   const scrollContainerRef = useRef(null);
 
   const [messages, setMessages] = useState([
@@ -99,7 +97,6 @@ const ChatBot = () => {
   return (
     <div className="flex relative h-screen">
       <Nav />
-
       <ScrollArea className="w-full">
         <div className="flex relative flex-col mx-auto w-full max-w-2xl min-h-screen">
           {/* Header */}
@@ -122,7 +119,7 @@ const ChatBot = () => {
               >
                 <ChatBubble
                   variant={msg.role === "user" ? "outline" : "default"}
-                  message={msg.content}
+                  message={msg.content} // ✅ FIXED HERE
                   role={msg.role}
                   position={msg.role === "user" ? "right" : "left"}
                   showAvatar={false}
@@ -130,7 +127,6 @@ const ChatBot = () => {
                 />
               </motion.div>
             ))}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Input area */}
@@ -165,4 +161,4 @@ const ChatBot = () => {
   );
 };
 
-export default ChatBot;
+export default ChatBubble;

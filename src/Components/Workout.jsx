@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
-import useUser from "../hooks/useUser";
 
 import { Card, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Button } from "./ui/button";
@@ -14,6 +13,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "./ui/alert-dialog";
+import useCurrentUser from "@/hooks/use-current-user";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -24,24 +24,27 @@ const workouts = [
   {
     image: "/images/challenges/hipdip.jpg",
     title: "Hip Dip",
-    description: "A core and oblique exercise where you move your hips side to side while holding a forearm plank position. This movement targets the obliques, glutes, and core, helping to improve stability, strength, and muscle definition in the midsection.",
+    description:
+      "A core and oblique exercise where you move your hips side to side while holding a forearm plank position. This movement targets the obliques, glutes, and core, helping to improve stability, strength, and muscle definition in the midsection.",
   },
   {
     image: "/images/challenges/updownplank.jpg",
     title: "Up Down Plank",
-    description: "A dynamic core exercise that involves transitioning between a forearm plank and a full plank position. This movement targets the core, shoulders, and arms, improving strength, stability, and endurance. It also helps enhance coordination and engages multiple muscle groups for a full-body workout.",
+    description:
+      "A dynamic core exercise that involves transitioning between a forearm plank and a full plank position. This movement targets the core, shoulders, and arms, improving strength, stability, and endurance. It also helps enhance coordination and engages multiple muscle groups for a full-body workout.",
   },
   {
     image: "/images/challenges/jumpsquat.jpg",
     title: "Jump Squat",
-    description: "A high-intensity plyometric exercise that combines squats with an explosive jump. This move helps to build strength, power, and endurance in the lower body, targeting the quads, hamstrings, glutes, and calves. Ideal for boosting athletic performance and improving overall fitness.",
+    description:
+      "A high-intensity plyometric exercise that combines squats with an explosive jump. This move helps to build strength, power, and endurance in the lower body, targeting the quads, hamstrings, glutes, and calves. Ideal for boosting athletic performance and improving overall fitness.",
   },
 ];
 
 const Workout = () => {
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const navigate = useNavigate();
-  const { user } = useUser(); // Get the logged-in user
+  const { user } = useCurrentUser(); // Get the logged-in user
 
   const handleStart = async (workout) => {
     if (!user) {
@@ -71,24 +74,24 @@ const Workout = () => {
     <div className="flex flex-col gap-2">
       {workouts.map((item, index) => (
         <Card key={index} className="p-4">
-          <CardHeader className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardHeader className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <CardTitle className="text-3xl font-semibold uppercase">
                 {item.title}
               </CardTitle>
-              <p className="text-black/60 font-sans capitalize">
+              <p className="font-sans capitalize text-black/60">
                 {item.description}
               </p>
             </div>
             <CardDescription>
               <img
                 src={item.image}
-                className="w-full h-64 object-cover rounded-xl"
+                className="object-cover w-full h-64 rounded-xl"
                 alt={item.title}
               />
             </CardDescription>
           </CardHeader>
-          <Button className="w-full mt-2" onClick={() => handleStart(item)}>
+          <Button className="mt-2 w-full" onClick={() => handleStart(item)}>
             START
           </Button>
         </Card>
@@ -104,7 +107,7 @@ const Workout = () => {
             <AlertDialogHeader>
               <AlertDialogTitle>
                 Are you ready to start the{" "}
-                <span className="uppercase font-bold text-primary">
+                <span className="font-bold uppercase text-primary">
                   {selectedWorkout.title}
                 </span>{" "}
                 Challenge?
