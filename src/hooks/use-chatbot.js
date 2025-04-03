@@ -38,7 +38,7 @@ const useChatbot = () => {
       optimisticData: [...tempMessages, newUserMessage],
     });
 
-    // Insert user message to Supabase
+    // Insert user ge to Supabase
     await supabase.from("chat_messages").insert(newUserMessage);
 
     try {
@@ -68,11 +68,11 @@ const useChatbot = () => {
       const newBotMessage = { role: "bot", message: botResponse };
       // setTempMessages(t);
 
-      const newBotMessage = {
-        role: "bot",
-        message: botResponse,
-        user_id: user.id,
-      };
+      //   const newBotMessage = {
+      //     role: "bot",
+      //     message: botResponse,
+      //     user_id: user.id,
+      //   };
 
       // Insert bot message to Supabase
       await supabase.from("chat_messages").insert(newBotMessage);
