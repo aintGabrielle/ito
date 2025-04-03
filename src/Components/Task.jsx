@@ -159,7 +159,7 @@ const EnhancedSuggestions = () => {
   };
 
   return (
-    <div className="flex h-full bg-green-400 min-h-screen">
+    <div className="flex h-full bg-[url(/images/fitnesss.png)] bg-cover min-h-screen">
       <Nav />
       <div className="px-6 py-8 max-w-7xl mx-auto w-full">
         <h2 className="text-3xl font-bold mb-6 text-green-700">

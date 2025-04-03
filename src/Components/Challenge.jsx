@@ -40,7 +40,7 @@ const ChallengeManager = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex md:flex-row h-full overflow-hidden">
+    <div className="flex md:flex-row h-full overflow-hidden bg-[url(/images/fitnesss.png)] bg-cover gap-6 ">
       {/* Mobile Sidebar Toggle */}
       <Nav />
 
