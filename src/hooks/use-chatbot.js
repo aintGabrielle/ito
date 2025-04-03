@@ -23,7 +23,9 @@ const useChatbot = () => {
 		isLoading,
 		error,
 		mutate,
-	} = useSWR(`/chat_messages_${user.id}`, async () => fetcher(user.id));
+	} = useSWR(user?.id ? `/chat_messages_${user.id}` : null, async () =>
+		fetcher(user.id),
+	);
 	const [tempMessages, setTempMessages] = useState(messages);
 
 	const sendMessage = async (userInput) => {
