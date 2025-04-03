@@ -19,7 +19,7 @@ const EnhancedSuggestions = () => {
     const filtered = cards.filter((c) => c.type === type);
 
     return (
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible className="w-full z-50">
         {filtered.map((item, i) => (
           <AccordionItem key={i} value={`${item.title}-${i}`}>
             <AccordionTrigger>{item.title}</AccordionTrigger>
