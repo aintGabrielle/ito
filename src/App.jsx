@@ -26,7 +26,7 @@ function FeatureSection({ title, description, imageSrc, imageAlt, imageLeft }) {
           />
         </motion.div>
 
-        <Nav />
+        {/* <Nav /> */}
         <motion.div
           initial={{ opacity: 0, x: imageLeft ? 30 : -30 }}
           whileInView={{ opacity: 1, x: 0 }}
