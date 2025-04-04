@@ -5,6 +5,7 @@ import Nav from "./Components/Nav";
 import { Button } from "./Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./Components/ui/card";
 import "./index.css";
+import Footer from "./Components/Footer";
 
 function FeatureSection({ title, description, imageSrc, imageAlt, imageLeft }) {
   return (
@@ -203,6 +204,7 @@ function App() {
           </div>
         </section>
       </main>
+      <Footer />
     </>
   );
 }
